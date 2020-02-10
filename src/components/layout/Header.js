@@ -22,7 +22,7 @@ const headerStyle= {
     textAlign: 'center',
     padding: '5px'
 }
-const linkStyle = {
+export const linkStyle = {
     color: '#FFFF00'
 }
 export default Header
