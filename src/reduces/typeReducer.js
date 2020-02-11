@@ -12,6 +12,12 @@ export default function( state=initialState, action) {
                 ...state,
                 types: action.payload
             }
+        
+        case actionTypes.SUBTYPE_FETCH :
+            return {
+                ...state,
+                subtypes: action.payload
+            }
         default: return state;
     }
 }

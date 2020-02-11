@@ -27,3 +27,4 @@ export function removeProductFromProducts(products, item_code) {
     }
     return newProducts;
 }
+

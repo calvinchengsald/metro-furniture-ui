@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ProductInfo from './ProductInfo'
 import {connect} from 'react-redux' ;
 import { fetchProducts, removeRecentAdd,deleteProduct  } from '../actions/productActions';
-import { fetchTypes  } from '../actions/typeActions';
+import { fetchTypes,fetchSubtypes  } from '../actions/typeActions';
 import PropTypes from 'prop-types';
 import ProductInfoForm from './ProductInfoForm';
 import {insertionSort} from '../utils/sort'
@@ -15,6 +15,7 @@ class Inventory extends Component {
     componentDidMount() {
        this.props.fetchProducts();
        this.props.fetchTypes();
+       this.props.fetchSubtypes();
     }
 
 
@@ -27,7 +28,7 @@ class Inventory extends Component {
         ));
         
         const types = this.props.types.map( data => (
-            <Type key={data.type} type={data}
+            <Type key={data.m_type} type={data} allSubtypes ={this.props.subtypes}
 
             >
             </Type>
@@ -49,16 +50,19 @@ class Inventory extends Component {
                 </div>
                 <hr></hr>
                 <Route path="/inventory/types" > 
-                    <table className="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {types}
-                            </tbody>
-                        </table>
+                    <table className="table table-striped  table-hover ">
+                        <thead className="">
+                            <tr className="row">
+                                <th className="col-sm-2 border">Pciture</th>
+                                <th className="col-sm-2 border">Type</th>
+                                <th className="col-sm-2 border">Description</th>
+                                <th className="col-sm-6 border">Subtype</th>
+                            </tr>
+                        </thead>
+                        <tbody className="">
+                            {types}
+                        </tbody>
+                    </table>
                 </Route>
                 <Route path="/inventory/products" > 
                     <table className="table table-striped table-bordered table-hover">
@@ -96,8 +100,10 @@ Inventory.propTypes = {
     fetchProducts: PropTypes.func.isRequired,
     deleteProduct: PropTypes.func.isRequired,
     fetchTypes: PropTypes.func.isRequired,
+    fetchSubtypes: PropTypes.func.isRequired,
     products: PropTypes.array.isRequired,
-    removeRecentAdd: PropTypes.func.isRequired
+    removeRecentAdd: PropTypes.func.isRequired,
+    subtypes: PropTypes.array.isRequired
 }
 
 
@@ -108,7 +114,8 @@ const linkStyle = {
 const mapStateToProps = state => ({
     products: state.productReducer.products,
     types: state.typeReducer.types,
-    recentAddItemCode: state.productReducer.recentAddItemCode
+    recentAddItemCode: state.productReducer.recentAddItemCode,
+    subtypes: state.typeReducer.subtypes
 });
 
-export default connect(mapStateToProps, {fetchProducts,removeRecentAdd,deleteProduct, fetchTypes})(Inventory);
+export default connect(mapStateToProps, {fetchProducts,removeRecentAdd,deleteProduct, fetchTypes,fetchSubtypes})(Inventory);
