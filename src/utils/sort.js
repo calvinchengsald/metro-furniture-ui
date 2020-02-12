@@ -31,6 +31,65 @@ export function insertionSort(arr)
   return arr;
 }
 
+
+export function sortSubtype(arr)
+{
+  for (var i = 1; i < arr.length; i++) 
+  {
+    if (arr[i].m_subtype < arr[0].m_subtype) 
+    {
+      //move current element to the first position
+      arr.unshift(arr.splice(i,1)[0]);
+    } 
+    else if (arr[i].m_subtype > arr[i-1].m_subtype) 
+    {
+      //leave current element where it is
+      continue;
+    } 
+    else {
+      //find where element should go
+      for (var j = 1; j < i; j++) {
+        if (arr[i].m_subtype > arr[j-1].m_subtype && arr[i].m_subtype < arr[j].m_subtype) 
+        {
+          //move element
+          arr.splice(j,0,arr.splice(i,1)[0]);
+        }
+      }
+    }
+  }
+  return arr;
+}
+
+
+export function sortType(arr)
+{
+  for (var i = 1; i < arr.length; i++) 
+  {
+    if (arr[i].m_type < arr[0].m_type) 
+    {
+      //move current element to the first position
+      arr.unshift(arr.splice(i,1)[0]);
+    } 
+    else if (arr[i].m_type > arr[i-1].m_type) 
+    {
+      //leave current element where it is
+      continue;
+    } 
+    else {
+      //find where element should go
+      for (var j = 1; j < i; j++) {
+        if (arr[i].m_type > arr[j-1].m_type && arr[i].m_type < arr[j].m_type) 
+        {
+          //move element
+          arr.splice(j,0,arr.splice(i,1)[0]);
+        }
+      }
+    }
+  }
+  return arr;
+}
+
+
 export function bubbleSort (list)  {
     var dummy = "";
     var counter=1;

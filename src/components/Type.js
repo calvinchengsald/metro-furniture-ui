@@ -1,7 +1,27 @@
-import React, { Component } from 'react'
-
+import React, { Component } from 'react';
+import Subtypes from './Subtypes';
+import {connect} from 'react-redux' ;
+import PropTypes from 'prop-types';
+import { updateTypes } from '../actions/typeActions';
 export class Type extends Component {
 
+    updateType = (oldType, newType) => {
+
+        var typeObject = this.props.type;
+        var subtypeArray = typeObject.subtype;
+        var newSubtypeArray = [];
+        for(var i =0 ; i<subtypeArray.length; i++) {
+            if(subtypeArray[i]!==oldType){
+                newSubtypeArray.push(subtypeArray[i]);
+            }
+        }
+        newSubtypeArray.push(newType);
+        typeObject = {
+            ...typeObject,
+            subtype: newSubtypeArray
+        }
+        this.props.updateTypes(typeObject);
+    }
     
 
     render() {
@@ -14,11 +34,8 @@ export class Type extends Component {
         }
         
         const getSubtypeList = actualSubtype.map( (sub) => (
-            <div key={sub.m_subtype} className="row">
-                <img className="col-sm-3" src={sub.m_url} alt="not found"></img> 
-                <div className="col-sm-3">{sub.m_subtype}</div>
-                <div className="col-sm-3">{sub.m_description}</div>
-            </div>
+            <Subtypes  key={sub.m_subtype} subtype ={sub} updateType={this.updateType} ></Subtypes>
+            
 
         ));
 
@@ -35,18 +52,24 @@ export class Type extends Component {
                 </td>
             </tr>
             
-            // <tr className="col-sm-6">
-            //     <div className="row">
-            //     <td className="col-sm-12 border">Subtype</td>
-            //     </div>
-            // </tr>
-
-            // <div>
-            //     {this.props.type.m_type}
-            // </div>
         )
     }
 }
 
 
-export default Type
+
+Type.propTypes = {
+    allSubtypes: PropTypes.array.isRequired,
+    type: PropTypes.object.isRequired,
+    updateTypes: PropTypes.func.isRequired
+    // currentTypeEdit: PropTypes.string.isRequired
+}
+
+
+const mapStateToProps = state => ({
+    
+    // currentTypeEdit: state.typeReducer.currentTypeEdit,
+
+});
+
+export default connect(mapStateToProps, { updateTypes })(Type);

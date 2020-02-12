@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import ProductInfo from './ProductInfo'
 import {connect} from 'react-redux' ;
 import { fetchProducts, removeRecentAdd,deleteProduct  } from '../actions/productActions';
-import { fetchTypes,fetchSubtypes  } from '../actions/typeActions';
 import PropTypes from 'prop-types';
+import { fetchTypes,fetchSubtypes  } from '../actions/typeActions';
 import ProductInfoForm from './ProductInfoForm';
-import {insertionSort} from '../utils/sort'
+import {insertionSort, sortType, sortSubtype} from '../utils/sort'
 import {Link} from 'react-router-dom';
 import {  Route} from 'react-router-dom';
 import Type from './Type';
@@ -27,7 +27,7 @@ class Inventory extends Component {
             </ProductInfo>
         ));
         
-        const types = this.props.types.map( data => (
+        const types = sortType(this.props.types).map( data => (
             <Type key={data.m_type} type={data} allSubtypes ={this.props.subtypes}
 
             >
@@ -115,7 +115,7 @@ const mapStateToProps = state => ({
     products: state.productReducer.products,
     types: state.typeReducer.types,
     recentAddItemCode: state.productReducer.recentAddItemCode,
-    subtypes: state.typeReducer.subtypes
+    subtypes: sortSubtype(state.typeReducer.subtypes)
 });
 
 export default connect(mapStateToProps, {fetchProducts,removeRecentAdd,deleteProduct, fetchTypes,fetchSubtypes})(Inventory);
