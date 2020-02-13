@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import {connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { postProduct  } from '../actions/productActions';
-import { isValidString, cleanArray } from '../utils/standardization';
+import { isValidString, removeFromArray } from '../utils/standardization';
 
 
 export class ProductInfoForm extends Component {
@@ -33,7 +33,7 @@ export class ProductInfoForm extends Component {
         }
     }
     onChangeTag = (e) => {
-        const tagArr = cleanArray(e.target.value.split(','),"");
+        const tagArr = removeFromArray(e.target.value.split(','),"");
         this.setState({
             ...this.state,
             tag: tagArr

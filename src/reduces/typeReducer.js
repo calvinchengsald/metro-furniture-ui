@@ -1,5 +1,5 @@
 import {actionTypes} from '../actions/types';
-import {updateSubtypeFromSubtype,updateTypeFromType } from '../utils/standardization';
+import {updateSubtypeFromSubtype,updateTypeFromType, removeSubtypeFromSubtype } from '../utils/standardization';
 
 const initialState = {
     types: [],
@@ -21,6 +21,18 @@ export default function( state=initialState, action) {
                 types: newTypes
             }
         
+        case actionTypes.TYPE_POST :
+
+            const newType = {
+                m_type: action.payload.m_type,
+                m_description: action.payload.m_description,
+                m_url: action.payload.m_url,
+            }
+            return {
+                ...state,
+                types: [...state.types, newType]
+            }
+        
         case actionTypes.SUBTYPE_FETCH :
             return {
                 ...state,
@@ -35,8 +47,25 @@ export default function( state=initialState, action) {
                 subtypes: newSubtypes
             }
         
-        case actionTypes.SUBTYPE_UPDATEDELETE :
+        case actionTypes.SUBTYPE_DELETE :
 
+            const newSubtypes2 = removeSubtypeFromSubtype(state.subtypes, action.payload.m_subtype);
+            return {
+                ...state,
+                subtypes: newSubtypes2
+            }
+        case actionTypes.SUBTYPE_POST :
+
+            const newSubtype = {
+                m_subtype: action.payload.m_subtype,
+                m_description: action.payload.m_description,
+                m_url: action.payload.m_url,
+            }
+            return {
+                ...state,
+                subtypes: [...state.subtypes, newSubtype]
+            }
+        
         default: return state;
     }
 }

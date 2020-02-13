@@ -5,6 +5,7 @@ import { fetchProducts, removeRecentAdd,deleteProduct  } from '../actions/produc
 import PropTypes from 'prop-types';
 import { fetchTypes,fetchSubtypes  } from '../actions/typeActions';
 import ProductInfoForm from './ProductInfoForm';
+import TypeForm from './TypeForm';
 import {insertionSort, sortType, sortSubtype} from '../utils/sort'
 import {Link} from 'react-router-dom';
 import {  Route} from 'react-router-dom';
@@ -12,12 +13,31 @@ import Type from './Type';
 
 class Inventory extends Component {
 
+    constructor(props){
+        super(props);
+        this.state = {
+            typeEditMode: false
+        }
+    }
     componentDidMount() {
        this.props.fetchProducts();
        this.props.fetchTypes();
        this.props.fetchSubtypes();
     }
 
+    toggleTypeEditMode = (editMode) => {
+        // if(bool){
+        //     this.setState({
+        //         ...this.state,
+        //         typeEditMode: bool
+        //     })
+        // }
+
+        this.setState({
+            ...this.state,
+            typeEditMode: editMode
+        });
+    }
 
     render() {
         const products = insertionSort(this.props.products).map( data => (
@@ -54,13 +74,31 @@ class Inventory extends Component {
                         <thead className="">
                             <tr className="row">
                                 <th className="col-sm-2 border">Pciture</th>
-                                <th className="col-sm-2 border">Type</th>
+                                <th className="col-sm-1 border">Type</th>
                                 <th className="col-sm-2 border">Description</th>
-                                <th className="col-sm-6 border">Subtype</th>
+                                <th className="col-sm-1 border">Actions</th>
+                                <th className="col-sm-6 border text-center">Subtype
+                                    <div className="row">
+                                        <span className="col-sm-3 text-left"> Picture</span>
+                                        <span className="col-sm-3 text-left"> Type</span>
+                                        <span className="col-sm-3 text-left"> Description</span>
+                                        <span className="col-sm-3 text-left"> Actions</span>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="">
                             {types}
+                            <tr className="row">
+                                {this.state.typeEditMode? 
+                                <TypeForm toggleTypeEditMode={(bool)=>{this.toggleTypeEditMode(bool)}}></TypeForm> 
+                                :
+                                <td>
+                                    <button className="btn btn-primary" onClick={()=>{this.toggleTypeEditMode(true)}} >Add Type</button>
+                                </td> 
+                                
+                                }
+                            </tr>
                         </tbody>
                     </table>
                 </Route>

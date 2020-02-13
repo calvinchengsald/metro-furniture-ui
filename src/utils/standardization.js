@@ -8,14 +8,21 @@ export function isValid (value) {
     return value!==undefined && value!==null;
 }
 
+export function coalesceString(value, defaultString) {
+    if (value===undefined || value ===null ) {
+        return defaultString;
+    }
+    return value;
+}
 
-export function cleanArray(arr, value) {
+export function removeFromArray(arr, value) {
+    var newArr = [];
     for (var i=0; i<arr.length; i++) {
-        if(arr[i] === value){
-            arr.splice(i,1);
+        if(arr[i] !== value){
+            newArr.push(arr[i]);
         }
     }
-    return arr;
+    return newArr;
 }
 
 export function removeProductFromProducts(products, item_code) {
@@ -29,17 +36,6 @@ export function removeProductFromProducts(products, item_code) {
 }
 
 
-export function updateSubtypeFromSubtype(subtypes, updatedSubtype) {
-    var newSubtypes = [];
-    for ( var i = 0; i < subtypes.length; i++) {
-        if (subtypes[i].m_subtype !== updatedSubtype.m_subtype) {
-            newSubtypes.push(subtypes[i]);
-        }
-    }
-    newSubtypes.push(updatedSubtype)
-    return newSubtypes;
-}
-
 
 export function updateTypeFromType(type, updateType) {
     var newType = [];
@@ -52,3 +48,25 @@ export function updateTypeFromType(type, updateType) {
     return newType;
 }
 
+
+
+export function removeSubtypeFromSubtype(subtypes, m_subtype) {
+    var newSubtypes = [];
+    for ( var i = 0; i < subtypes.length; i++) {
+        if (subtypes[i].m_subtype !== m_subtype) {
+            newSubtypes.push(subtypes[i]);
+        }
+    }
+    return newSubtypes;
+}
+
+export function updateSubtypeFromSubtype(subtypes, updatedSubtype) {
+    var newSubtypes = [];
+    for ( var i = 0; i < subtypes.length; i++) {
+        if (subtypes[i].m_subtype !== updatedSubtype.m_subtype) {
+            newSubtypes.push(subtypes[i]);
+        }
+    }
+    newSubtypes.push(updatedSubtype)
+    return newSubtypes;
+}
