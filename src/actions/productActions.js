@@ -1,5 +1,7 @@
 import {actionTypes, basePath} from '../actions/types'
 import axios from 'axios';
+import {modelAttributeMapping} from '../models/models';
+import {objectStandardizer } from '../utils/standardization';
 
 export function fetchProducts() {
 
@@ -8,11 +10,20 @@ export function fetchProducts() {
          axios.get( basePath +'/product/all')
          .then(res => {
              
+            res.data.content = res.data.content.map((data) => {
+                return objectStandardizer(data, modelAttributeMapping.PRODUCT_INFO_MODEL);
+            });
             dispatch({
                 type: actionTypes.ITEM_FETCH,
                 payload: res.data.content
             })
             
+         })
+         .catch( error => {
+            dispatch({
+                type: actionTypes.MESSAGE_CHANGE,
+                payload: error
+            })
          })
     }
     
@@ -25,6 +36,8 @@ export function postProduct(product) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
          axios.post( basePath + '/product',product )
          .then(res => {
+             
+            res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.PRODUCT_INFO_MODEL );
             dispatch({
                 type: actionTypes.ITEM_POST,
                 payload: res.data.content
@@ -34,7 +47,7 @@ export function postProduct(product) {
          .catch( error => {
             dispatch({
                 type: actionTypes.MESSAGE_CHANGE,
-                payload: error.response.data
+                payload: error
             })
          })
     }
@@ -48,6 +61,7 @@ export function deleteProduct(product) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
          axios.post(  basePath + '/product/delete',product )
          .then(res => {
+            res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.PRODUCT_INFO_MODEL );
             dispatch({
                 type: actionTypes.ITEM_DELETE,
                 payload: res.data.content
@@ -57,7 +71,7 @@ export function deleteProduct(product) {
          .catch( error => {
             dispatch({
                 type: actionTypes.MESSAGE_CHANGE,
-                payload: error.response.data
+                payload: error
             })
          })
     }

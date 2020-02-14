@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { coalesceString } from '../utils/standardization';
+import { coalesceString, objectStandardizer} from '../utils/standardization';
+import { modelAttributeMapping } from '../models/models';
 import { postTypes } from '../actions/typeActions';
 import {connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -28,16 +29,17 @@ export class TypeForm extends Component {
     changeField = (e) => {
         this.setState({
             ...this.state,
-            [e.target.name] : e.target.value.trim()
+            [e.target.name] : e.target.value
         })
     }
     add = () => {
-        const newType = {
+        var newType = {
             m_type: this.state.m_type,
-            m_url: coalesceString(this.state.m_url,""),
-            m_description: coalesceString(this.state.m_description,""),
+            m_url: coalesceString(this.state.m_url,"").trim(),
+            m_description: coalesceString(this.state.m_description,"").trim(),
             subtype: this.state.subtype
         }
+        newType = objectStandardizer(newType,modelAttributeMapping.TYPE_MODEL );
         
         this.props.postTypes(newType, (success)=>{
             if(success) {

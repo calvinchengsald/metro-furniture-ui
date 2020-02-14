@@ -3,8 +3,8 @@ import Subtypes from './Subtypes';
 import SubtypeForm from './SubtypeForm';
 import {connect} from 'react-redux' ;
 import PropTypes from 'prop-types';
-import { updateTypes, deleteSubtypes, postSubtypes, fetchTypes, deleteUpdateTypes } from '../actions/typeActions';
-import {  removeFromArray, isValid } from '../utils/standardization';
+import { updateTypes, deleteSubtypes, postSubtypes, fetchTypes, deleteUpdateTypes, deleteTypes } from '../actions/typeActions';
+import {  removeFromArray, isValid, blankStringIncludes } from '../utils/standardization';
 export class Type extends Component {
 
     constructor(props) {
@@ -49,7 +49,7 @@ export class Type extends Component {
     fullUpdateType = () => {
 
          // is there really any update?
-         if(this.props.type.m_type === this.state.m_type && this.props.type.m_description === this.state.m_description 
+         if(this.props.type.m_type.trim() === this.state.m_type.trim() && this.props.type.m_description.trim() === this.state.m_description.trim() 
             && this.props.type.m_url === this.state.m_url ) {
                this.toggleEditMode(false);
                return;
@@ -57,7 +57,7 @@ export class Type extends Component {
 
 
         // just an update or a delete update (changing primary key)
-        if(this.props.type.m_type !== this.state.m_type){
+        if(this.props.type.m_type.trim() !== this.state.m_type.trim()){
             var deleteUpdateModel = {
                 model: {
                     m_type: this.state.m_type,
@@ -111,6 +111,7 @@ export class Type extends Component {
 
     // new subtype is created, need to update type as well (the subtype array list in type)
     postSubtypesAndUpdateType = (subtype, successCallbackFunction) => {
+        
         const newType = {
             ...this.props.type,
             subtype: [...this.props.type.subtype, subtype.m_subtype]
@@ -158,8 +159,6 @@ export class Type extends Component {
             });
         }
     }
-
-    
     toggleConfirmDelete = (bool) => {
         this.setState({
             ...this.state,
@@ -171,7 +170,7 @@ export class Type extends Component {
     changeField = (e) => {
         this.setState({
             ...this.state,
-            [e.target.name] : e.target.value.trim()
+            [e.target.name] : e.target.value
         })
     }
 
@@ -179,8 +178,10 @@ export class Type extends Component {
     // what about items of this type? oh boy
     // when edit, also what about items of this type????????
     actualDelete = () => {
-
+        
+        this.props.deleteTypes(this.props.type);
     }
+        
 
     render() {
 
@@ -188,13 +189,13 @@ export class Type extends Component {
 
         if (isValid(this.props.type.subtype)){
             for( var i=0; i < this.props.allSubtypes.length; i++) {
-                if (this.props.type.subtype.includes(this.props.allSubtypes[i].m_subtype) ) {
+                if ( blankStringIncludes( this.props.type.subtype , this.props.allSubtypes[i].m_subtype ) ) {
                     actualSubtype.push(this.props.allSubtypes[i]);
                 }
             }
         } 
         
-        const getSubtypeList = actualSubtype.map( (sub) => (
+        const subtypeDisplayElements = actualSubtype.map( (sub) => (
             <Subtypes  key={sub.m_subtype} subtype ={sub} updateType={this.updateType} deleteSubtypesAndUpdateType={this.deleteSubtypesAndUpdateType} ></Subtypes>
             
 
@@ -256,7 +257,7 @@ export class Type extends Component {
             <tr className="row">
                 {this.state.editMode? mainJSXEditMode: mainJSXShowMode}
                 <td className="col-sm-6 border"> 
-                    {getSubtypeList}
+                    {subtypeDisplayElements}
 
                     {this.state.addSubtype? 
                         <SubtypeForm toggleAddSubtype={ (bool) => {this.toggleAddSubtype(bool)}}
@@ -281,7 +282,8 @@ Type.propTypes = {
     deleteSubtypes: PropTypes.func.isRequired,
     postSubtypes: PropTypes.func.isRequired,
     fetchTypes: PropTypes.func.isRequired,
-    deleteUpdateTypes: PropTypes.func.isRequired
+    deleteUpdateTypes: PropTypes.func.isRequired,
+    deleteTypes: PropTypes.func.isRequired
     // currentTypeEdit: PropTypes.string.isRequired
 }
 
@@ -292,4 +294,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default connect(mapStateToProps, { updateTypes , deleteSubtypes,postSubtypes,deleteUpdateTypes, fetchTypes})(Type);
+export default connect(mapStateToProps, { updateTypes , deleteSubtypes,postSubtypes,deleteUpdateTypes, fetchTypes, deleteTypes})(Type);

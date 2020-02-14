@@ -6,10 +6,12 @@ import PropTypes from 'prop-types';
 import { fetchTypes,fetchSubtypes  } from '../actions/typeActions';
 import ProductInfoForm from './ProductInfoForm';
 import TypeForm from './TypeForm';
+import Subtypes from './Subtypes';
 import {insertionSort, sortType, sortSubtype} from '../utils/sort'
 import {Link} from 'react-router-dom';
 import {  Route} from 'react-router-dom';
 import Type from './Type';
+import {blankStringIncludes} from '../utils/standardization';
 
 class Inventory extends Component {
 
@@ -39,7 +41,29 @@ class Inventory extends Component {
         });
     }
 
+    getParentlessSubtypes = () => {
+        var parentfulSubtypes = [];
+        for (var index in this.props.types) {
+            parentfulSubtypes =parentfulSubtypes.concat(this.props.types[index].subtype);
+        }
+        var parentlessSubtypes = [];
+        for (var index2 in this.props.subtypes) {
+            if( ! blankStringIncludes(parentfulSubtypes, this.props.subtypes[index2].m_subtype) ){
+                parentlessSubtypes = [...parentlessSubtypes, this.props.subtypes[index2]];
+            }
+            
+        }
+        return parentlessSubtypes;
+
+    }
+    
+
     render() {
+        const parentlessSubtypes = this.getParentlessSubtypes().map( sub => (
+            
+            <Subtypes  key={sub.m_subtype} subtype ={sub} parentless={true} types={this.props.types}></Subtypes>
+
+        ));
         const products = insertionSort(this.props.products).map( data => (
             <ProductInfo key={data.item_code} product={data} recentAddItemCode={this.props.recentAddItemCode} removeRecentAdd={this.props.removeRecentAdd} 
                 deleteProduct={this.props.deleteProduct}
@@ -80,7 +104,7 @@ class Inventory extends Component {
                                 <th className="col-sm-6 border text-center">Subtype
                                     <div className="row">
                                         <span className="col-sm-3 text-left"> Picture</span>
-                                        <span className="col-sm-3 text-left"> Type</span>
+                                        <span className="col-sm-3 text-left"> Subtype</span>
                                         <span className="col-sm-3 text-left"> Description</span>
                                         <span className="col-sm-3 text-left"> Actions</span>
                                     </div>
@@ -89,6 +113,14 @@ class Inventory extends Component {
                         </thead>
                         <tbody className="">
                             {types}
+                            <tr className="row">
+                                <td className="col-sm-6 border"> 
+                                    Parentless Subtypes
+                                </td>
+                                <td className="col-sm-6 border"> 
+                                    {parentlessSubtypes}
+                                </td>
+                            </tr>
                             <tr className="row">
                                 {this.state.typeEditMode? 
                                 <TypeForm toggleTypeEditMode={(bool)=>{this.toggleTypeEditMode(bool)}}></TypeForm> 
@@ -141,7 +173,8 @@ Inventory.propTypes = {
     fetchSubtypes: PropTypes.func.isRequired,
     products: PropTypes.array.isRequired,
     removeRecentAdd: PropTypes.func.isRequired,
-    subtypes: PropTypes.array.isRequired
+    subtypes: PropTypes.array.isRequired,
+    types: PropTypes.array.isRequired
 }
 
 

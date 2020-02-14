@@ -25,14 +25,14 @@ export class SubtypeForm extends Component {
     changeField = (e) => {
         this.setState({
             ...this.state,
-            [e.target.name] : e.target.value.trim()
+            [e.target.name] : e.target.value
         })
     }
     add = () => {
         const newSubtpe = {
             m_subtype: this.state.m_subtype,
-            m_url: coalesceString(this.state.m_url,""),
-            m_description: coalesceString(this.state.m_description,"")
+            m_url: coalesceString(this.state.m_url,"").trim(),
+            m_description: coalesceString(this.state.m_description,"").trim()
         }
         this.props.postSubtypesAndUpdateType(newSubtpe, (success)=>{
             if(success) {

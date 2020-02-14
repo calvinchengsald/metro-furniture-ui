@@ -17,8 +17,8 @@ export class ProductInfoForm extends Component {
             [e.target.name] : e.target.value.trim()
         };
 
+        // if either base code or m_size changes, we need to recompute the item_code
         if (e.target.name === "base_code" ||  e.target.name === "m_size"){
-            
             this.setState(newState, (newstate) => {
                 newState = {
                     ...newState,

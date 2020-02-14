@@ -1,5 +1,5 @@
 import {actionTypes} from '../actions/types';
-import {updateSubtypeFromSubtype,updateTypeFromType, removeSubtypeFromSubtype } from '../utils/standardization';
+import {updateObjectFromArrayByKey, removeElementFromArrayByKey } from '../utils/standardization';
 
 const initialState = {
     types: [],
@@ -15,7 +15,7 @@ export default function( state=initialState, action) {
             }
         case actionTypes.TYPE_UPDATE :
 
-            const newTypes = updateTypeFromType(state.types, action.payload);
+            const newTypes = updateObjectFromArrayByKey(state.types, "m_type", action.payload);
             return {
                 ...state,
                 types: newTypes
@@ -27,12 +27,20 @@ export default function( state=initialState, action) {
                 m_type: action.payload.m_type,
                 m_description: action.payload.m_description,
                 m_url: action.payload.m_url,
+                subtype: action.payload.subtype
             }
             return {
                 ...state,
                 types: [...state.types, newType]
             }
         
+        case actionTypes.TYPE_DELETE :
+
+            const newTypes2 = removeElementFromArrayByKey(state.types, "m_type", action.payload.m_type);
+            return {
+                ...state,
+                types: newTypes2
+            }
         case actionTypes.SUBTYPE_FETCH :
             return {
                 ...state,
@@ -41,7 +49,7 @@ export default function( state=initialState, action) {
         
         case actionTypes.SUBTYPE_UPDATE :
 
-            const newSubtypes = updateSubtypeFromSubtype(state.subtypes, action.payload);
+            const newSubtypes = updateObjectFromArrayByKey(state.subtypes, "m_subtype", action.payload);
             return {
                 ...state,
                 subtypes: newSubtypes
@@ -49,7 +57,7 @@ export default function( state=initialState, action) {
         
         case actionTypes.SUBTYPE_DELETE :
 
-            const newSubtypes2 = removeSubtypeFromSubtype(state.subtypes, action.payload.m_subtype);
+            const newSubtypes2 = removeElementFromArrayByKey(state.subtypes, "m_subtype", action.payload.m_subtype);
             return {
                 ...state,
                 subtypes: newSubtypes2

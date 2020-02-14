@@ -25,48 +25,61 @@ export function removeFromArray(arr, value) {
     return newArr;
 }
 
-export function removeProductFromProducts(products, item_code) {
-    var newProducts = [];
-    for ( var i = 0; i < products.length; i++) {
-        if (products[i].item_code !== item_code) {
-            newProducts.push(products[i]);
+
+
+
+export function removeElementFromArrayByKey( array , primaryKeyName, primaryKeyValue) {
+    var newArray = [];
+    for ( var i = 0; i < array.length; i++) {
+        if (array[i][primaryKeyName] !== primaryKeyValue) {
+            newArray.push(array[i]);
         }
     }
-    return newProducts;
+    return newArray;
 }
 
 
-
-export function updateTypeFromType(type, updateType) {
-    var newType = [];
-    for ( var i = 0; i < type.length; i++) {
-        if (type[i].m_type !== updateType.m_type) {
-            newType.push(type[i]);
+export function updateObjectFromArrayByKey(array, primaryKeyName , updatedElement) {
+    var newArray = [];
+    for ( var i = 0; i < array.length; i++) {
+        if (array[i][primaryKeyName] !== updatedElement[primaryKeyName]) {
+            newArray.push(array[i]);
         }
     }
-    newType.push(updateType)
-    return newType;
+    newArray.push(updatedElement)
+    return newArray;
 }
 
+export function objectStandardizer( object , objectMapping ) {
 
+    var standardizedObject = {};
+    for (var key of Object.keys(objectMapping)){
+        switch (objectMapping[key]) {
+            case "string" :
+                standardizedObject[key] = coalesceString(object[key],"").trim();
+                break;
+            case "array" :
+                standardizedObject[key] = isValid(object[key])?object[key]: [] ;
+                break;
+            default:
+                standardizedObject[key] = object[key]
 
-export function removeSubtypeFromSubtype(subtypes, m_subtype) {
-    var newSubtypes = [];
-    for ( var i = 0; i < subtypes.length; i++) {
-        if (subtypes[i].m_subtype !== m_subtype) {
-            newSubtypes.push(subtypes[i]);
         }
     }
-    return newSubtypes;
+    return standardizedObject
 }
 
-export function updateSubtypeFromSubtype(subtypes, updatedSubtype) {
-    var newSubtypes = [];
-    for ( var i = 0; i < subtypes.length; i++) {
-        if (subtypes[i].m_subtype !== updatedSubtype.m_subtype) {
-            newSubtypes.push(subtypes[i]);
+// normal includes will not do anything to the existing string.
+// due to bad data, we may need to trim all strings before checking for include comparison
+export function blankStringIncludes(array, object){
+    try {
+        for( var i = 0; i < array.length; i++){
+            // console.log(array[i].trim() + "/" + object.trim() + "=" + (array[i].trim() === object.trim() ))
+            if (array[i].trim() === object.trim() ) return true;
         }
+        return false;
     }
-    newSubtypes.push(updatedSubtype)
-    return newSubtypes;
+    catch (error ) {
+        return false;
+    }
 }

@@ -1,5 +1,5 @@
 import {actionTypes} from '../actions/types';
-import {removeProductFromProducts } from '../utils/standardization';
+import {removeElementFromArrayByKey } from '../utils/standardization';
 
 const initialState = {
     products: []
@@ -35,7 +35,7 @@ export default function( state=initialState, action) {
             }
         case actionTypes.ITEM_DELETE :
             
-            const newProducts = removeProductFromProducts(state.products, action.payload.item_code);
+            const newProducts = removeElementFromArrayByKey(state.products, "item_code", action.payload.item_code);
             return {
                 ...state,
                 products: newProducts
