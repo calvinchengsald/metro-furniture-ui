@@ -52,8 +52,20 @@ export class ProductInfoForm extends Component {
             tag: this.state.tag
 
         }
-        // console.log(product);
-        this.props.postProduct(product);
+        this.props.postProduct(product, (success) => {
+            document.getElementById("input_base_code").value="";
+            document.getElementById("input_m_size").value="";
+            document.getElementById("input_m_type").value="";
+            document.getElementById("input_m_subtype").value="";
+            // document.getElementById("input_color").value="";
+            document.getElementById("input_notes").value="";
+            document.getElementById("input_tag").value=[];
+            this.setState({
+                item_code: "",
+                base_code: "",
+                m_size:    ""
+            })
+        });
     }
 
     constructItemCode = () => {
@@ -63,19 +75,15 @@ export class ProductInfoForm extends Component {
 
     render() {
         return (
-            <tr>
-                <td> <div className='input form-control' name="item_code">{this.state.item_code}</div></td>
-                <td> <input className='form-control' type="text" name="base_code" onChange={this.onChange} placeholder="base code"></input></td>
-                <td> <input className='form-control' type="text" name="m_size"  onChange={this.onChange} placeholder="size"></input></td>
-                <td> <input className='form-control' type="text" name="m_type" onChange={this.onChange} placeholder="type"></input></td>
-                <td> <input className='form-control' type="text" name="m_subtype"   onChange={this.onChange} placeholder="subtype"></input></td>
-                {/* <td> <input className='form-control' type="text" name="thickness"   onChange={this.onChange} placeholder="thickness"></input></td> */}
-                {/* <td> <input className='form-control' type="text" name="cost"  onChange={this.onChange} placeholder="cost"></input></td> */}
-                <td> <input className='form-control' type="text" name="color"  onChange={this.color} placeholder="color"></input></td>
-                {/* <td> <input className='form-control' type="text" name="edge_option" value={this.props.edge_option}  onChange={this.onChange} placeholder="edge_option"></input></td>
-                <td> <input className='form-control' type="text" name="seat_option" value={this.props.seat_option}  onChange={this.onChange} placeholder="seat_option"></input></td> */}
-                <td> <input className='form-control' type="text" name="notes"   onChange={this.onChange} placeholder="notes"></input></td>
-                <td> <input className='form-control' type="text" name="tag"   onChange={this.onChangeTag} placeholder="tag"></input></td>
+            <tr className="row">
+                <td className="col-sm-1"> <div className='input form-control' name="item_code">{this.state.item_code}</div></td>
+                <td className="col-sm-1"> <input className='form-control' type="text" name="base_code" id="input_base_code" onChange={this.onChange} placeholder="base code"></input></td>
+                <td className="col-sm-1"> <input className='form-control' type="text" name="m_size"    id="input_m_size"    onChange={this.onChange} placeholder="size"></input></td>
+                <td className="col-sm-2"> <input className='form-control' type="text" name="m_type"    id="input_m_type"    onChange={this.onChange} placeholder="type"></input></td>
+                <td className="col-sm-2"> <input className='form-control' type="text" name="m_subtype" id="input_m_subtype" onChange={this.onChange} placeholder="subtype"></input></td>
+                <td className="col-sm-2"> <input className='form-control' type="text" name="color"     id="input_color"     onChange={this.color} placeholder="color"></input></td>
+                <td className="col-sm-1"> <input className='form-control' type="text" name="notes"     id="input_notes"     onChange={this.onChange} placeholder="notes"></input></td>
+                <td className="col-sm-1"> <input className='form-control' type="text" name="tag"       id="input_tag"       onChange={this.onChangeTag} placeholder="tag"></input></td>
 
                 <td> <button  onClick={this.onSubmit}  > Create </button></td>
             </tr>

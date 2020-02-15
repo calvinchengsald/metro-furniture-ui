@@ -3,12 +3,12 @@ export const modelAttributeMapping = {
     PRODUCT_INFO_MODEL: {
         item_code: "string",
         base_code: "string",
-        size: "string",
-        type: "string",
-        subtype: "string",
+        m_size: "string",
+        m_type: "string",
+        m_subtype: "string",
         // color: "array",
         notes: "string",
-        tags: "array"
+        tag: "array"
     },
     TYPE_MODEL: {
         m_type: "string",

@@ -40,7 +40,6 @@ export function postTypes(type,callbackSuccessfulUpdate) {
          .then(res => {
             callbackSuccessfulUpdate(true);
             res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.TYPE_MODEL );
-            console.log( res.data.content);
             dispatch({
                 type: actionTypes.TYPE_POST,
                 payload: res.data.content

@@ -135,22 +135,18 @@ class Inventory extends Component {
                     </table>
                 </Route>
                 <Route path="/inventory/products" > 
-                    <table className="table table-striped table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Base Code</th>
-                                <th>Size </th>
-                                <th>Type </th>
-                                <th>Subtype </th>
-                                {/* <th>Thickness </th>
-                                <th>Cost </th> */}
-                                <th>Color </th>
-                                {/* <th>Edge Option </th>
-                                <th>Seat Option </th> */}
-                                <th>Notes </th>
-                                <th>Tags </th>
-                                <th>Action</th>
+                    <table className="table table-striped table-hover">
+                        <thead className="">
+                            <tr className="row">
+                                <th className="col-sm-1">Item Code</th>
+                                <th className="col-sm-1">Base Code</th>
+                                <th className="col-sm-1">Size </th>
+                                <th className="col-sm-2">Type </th>
+                                <th className="col-sm-2">Subtype </th>
+                                <th className="col-sm-2">Color </th>
+                                <th className="col-sm-1">Notes </th>
+                                <th className="col-sm-1">Tags </th>
+                                <th className="col-sm-1">Action</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -83,3 +83,14 @@ export function blankStringIncludes(array, object){
         return false;
     }
 }
+
+export function arrayToCSV(array) {
+    if ( !Array.isArray(array) || !isValid(array) || array.length ===0){
+        return "";
+    }
+    var csv = array[0];
+    for(var i = 1; i < array.length; i++){
+        csv += "," + array[i] ;
+    }
+    return csv;
+}
