@@ -84,6 +84,19 @@ export function blankStringIncludes(array, object){
     }
 }
 
+// same as blankStringIncludes but for an array of object focusing on checking primary key
+export function blankStringIncludesByKey(array, object, primaryKeyName){
+    try {
+        for( var i = 0; i < array.length; i++){
+            if (array[i][primaryKeyName].trim() === object.trim() ) return true;
+        }
+        return false;
+    }
+    catch (error ) {
+        return false;
+    }
+}
+
 export function arrayToCSV(array) {
     if ( !Array.isArray(array) || !isValid(array) || array.length ===0){
         return "";
@@ -93,4 +106,28 @@ export function arrayToCSV(array) {
         csv += "," + array[i] ;
     }
     return csv;
+}
+
+
+//given a type object, get an array of all subtype objects belonging to that type
+export function getSubtypeFromType(targetTypeObject, allSubtypes) {
+    var actualSubtype = [];
+
+    if (isValid(allSubtypes)){
+        for( var i=0; i < allSubtypes.length; i++) {
+            if ( blankStringIncludes( targetTypeObject.m_subtype , allSubtypes[i].m_subtype ) ) {
+                actualSubtype.push(allSubtypes[i]);
+            }
+        }
+    } 
+
+    return actualSubtype;
+}
+//if you only have the type string, havent done any filtering yet
+export function getSubtypeFromTypeString(targetTypeString, allTypes, allSubtypes) {
+    var targetTypeArr = allTypes.filter((type) => type.m_type===targetTypeString.trim());
+    if( !isValid(targetTypeArr[0])) {
+        return [];
+    }
+    return getSubtypeFromType(targetTypeArr[0], allSubtypes);
 }

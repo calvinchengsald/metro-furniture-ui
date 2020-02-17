@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux' ;
-import {  updateSubtypes , deleteSubtypes, fetchSubtypes, deleteUpdateSubtypes ,updateTypes} from '../actions/typeActions';
+import {  updateSubtypes , deleteSubtypes, fetchSubtypes, deleteUpdateSubtypes ,updateTypes, fetchTypes} from '../actions/typeActions';
+import { fetchProducts } from '../actions/productActions';
 import PropTypes from 'prop-types';
 import { isValid } from '../utils/standardization';
 import {Dropdown } from 'react-bootstrap';
+import { deletePostS3 } from '../actions/s3Actions';
 
 export class Subtypes extends Component {
 
@@ -69,10 +71,13 @@ export class Subtypes extends Component {
             };
             //since this exact subtype has changed, there will be a reload of subtypes.
             // this component will go away, it no longer exits. Will need to refetch subtype list
+            // similarly the type list needs to be refreshed since it has a linkage to a new subtype, so it needs to be refreshed
             this.props.deleteUpdateSubtypes(deleteUpdateModel, (success) => {
                 if(success){
-                    this.props.updateType(this.props.subtype.m_subtype, this.state.m_subtype);
+                    // this.props.updateType(this.props.subtype.m_subtype, this.state.m_subtype);
                     this.props.fetchSubtypes();
+                    this.props.fetchTypes();
+                    this.props.fetchProducts();
                 } 
                 else {
     
@@ -137,7 +142,7 @@ export class Subtypes extends Component {
             }
             var newTypeObject = {
                 ...typeObject[0],
-                subtype: [...typeObject[0].subtype, this.state.m_subtype.trim()]
+                m_subtype: [...typeObject[0].m_subtype, this.state.m_subtype.trim()]
             }
             this.props.updateTypes(newTypeObject, (success) => {
                 if(success){
@@ -155,13 +160,54 @@ export class Subtypes extends Component {
 
     }
 
+    
+    changeInputFile = (e) => {
+        if( !isValid(e.target.files) || e.target.files.length === 0){
+            return
+        }
+        var file = e.target.files[0];
+        console.log(file)
+        this.props.deletePostS3(file, "subtypes/", "", (success, url)=> {
+            if (success){
+                this.setState({
+                    ...this.state,
+                    m_url : url
+                })
+
+            }
+        })
+    }
+
+
+
+
     render() {
         
         const centerText = this.state.currentEdit? 
             <div className="row border-bottom">
-                <img className="col-sm-3" src={this.state.m_url} alt="not found"></img> 
-                <input className="col-sm-3"  type="text" name="m_subtype" value={this.state.m_subtype} onChange={this.changeField}></input>
-                <input className="col-sm-3"  type="text" name="m_description" value={this.state.m_description} onChange={this.changeField}></input>
+                <div className="col-sm-3">
+                    <div className="row">
+                        <img className="col-sm-12"  src={this.state.m_url} alt="not found"></img> 
+                    </div>
+                    
+                    <div className="input-group">
+                        <div className="custom-file">
+                            <input
+                            type="file"
+                            className="custom-file-input"
+                            id="inputGroupFile01"
+                            aria-describedby="inputGroupFileAddon01"
+                            onChange ={(e)=>{this.changeInputFile(e) }}
+                            />
+                            <label className="custom-file-label" htmlFor="inputGroupFile01">
+                            Choose file
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <input className="col-sm-3 form-control"  type="text" name="m_subtype" value={this.state.m_subtype} onChange={this.changeField}></input>
+                <input className="col-sm-3 form-control"  type="text" name="m_description" value={this.state.m_description} onChange={this.changeField}></input>
                 <div className="col-sm-3">
                     <button data-toggle="tooltip" data-placement="top" title="Save" onClick={this.save} > Save
                     </button>
@@ -247,7 +293,10 @@ Subtypes.propTypes = {
     deleteSubtypes: PropTypes.func.isRequired,
     deleteUpdateSubtypes: PropTypes.func.isRequired,
     fetchSubtypes: PropTypes.func.isRequired,
-    updateTypes: PropTypes.func.isRequired
+    updateTypes: PropTypes.func.isRequired,
+    fetchTypes: PropTypes.func.isRequired,
+    fetchProducts: PropTypes.func.isRequired,
+    deletePostS3: PropTypes.func.isRequired
     // updateType: PropTypes.func.isRequired
 
 }
@@ -258,4 +307,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default connect(mapStateToProps, {updateSubtypes,fetchSubtypes,deleteUpdateSubtypes, deleteSubtypes,updateTypes })(Subtypes);
+export default connect(mapStateToProps, {updateSubtypes,fetchSubtypes,deleteUpdateSubtypes, deleteSubtypes,updateTypes,fetchTypes,fetchProducts, deletePostS3 })(Subtypes);

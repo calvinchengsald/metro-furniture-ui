@@ -14,7 +14,7 @@ export const modelAttributeMapping = {
         m_type: "string",
         m_description: "string",
         m_url: "string",
-        subtype: "array"
+        m_subtype: "array"
     },
     SUBTYPE_MODEL: {
         m_subtype: "string",

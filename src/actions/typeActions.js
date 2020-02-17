@@ -39,10 +39,10 @@ export function postTypes(type,callbackSuccessfulUpdate) {
          axios.post( basePath +'/typehiearchy', type)
          .then(res => {
             callbackSuccessfulUpdate(true);
-            res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.TYPE_MODEL );
+            var newType  = objectStandardizer(res.data.content, modelAttributeMapping.TYPE_MODEL );
             dispatch({
                 type: actionTypes.TYPE_POST,
-                payload: res.data.content
+                payload: newType
             })
             
          })

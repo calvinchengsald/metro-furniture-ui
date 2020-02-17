@@ -4,7 +4,9 @@ import SubtypeForm from './SubtypeForm';
 import {connect} from 'react-redux' ;
 import PropTypes from 'prop-types';
 import { updateTypes, deleteSubtypes, postSubtypes, fetchTypes, deleteUpdateTypes, deleteTypes } from '../actions/typeActions';
-import {  removeFromArray, isValid, blankStringIncludes } from '../utils/standardization';
+import {  removeFromArray, getSubtypeFromType , isValid} from '../utils/standardization';
+import { fetchProducts } from '../actions/productActions';
+import { deletePostS3 } from '../actions/s3Actions';
 export class Type extends Component {
 
     constructor(props) {
@@ -16,12 +18,12 @@ export class Type extends Component {
             m_type:  this.props.type.m_type,
             m_url:  this.props.type.m_url,
             m_description:  this.props.type.m_description,
-            subtype: this.props.type.subtype,
+            m_subtype: this.props.type.m_subtype,
             prevState: {
                 m_type: "",
                 m_url: "",
                 m_description: "",
-                subtype: ""
+                m_subtype: ""
             }
         }
     }
@@ -30,7 +32,7 @@ export class Type extends Component {
     updateType = (oldSubtype, newSubtype) => {
 
         var typeObject = this.props.type;
-        var subtypeArray = typeObject.subtype;
+        var subtypeArray = typeObject.m_subtype;
         var newSubtypeArray = [];
         for(var i =0 ; i<subtypeArray.length; i++) {
             if(subtypeArray[i]!==oldSubtype){
@@ -40,7 +42,7 @@ export class Type extends Component {
         newSubtypeArray.push(newSubtype);
         typeObject = {
             ...typeObject,
-            subtype: newSubtypeArray
+            m_subtype: newSubtypeArray
         }
         this.props.updateTypes(typeObject, (success) => { });
     }
@@ -63,7 +65,7 @@ export class Type extends Component {
                     m_type: this.state.m_type,
                     m_url: this.state.m_url,
                     m_description: this.state.m_description,
-                    subtype: this.state.subtype
+                    m_subtype: this.state.m_subtype
                 },
                 prePrimaryKey: this.props.type.m_type
             };
@@ -71,6 +73,7 @@ export class Type extends Component {
             this.props.deleteUpdateTypes(deleteUpdateModel, (success) => {
                 if(success){
                     this.props.fetchTypes();
+                    this.props.fetchProducts();
                 } 
                 else {
     
@@ -85,7 +88,7 @@ export class Type extends Component {
             m_type: this.state.m_type,
             m_description: this.state.m_description,
             m_url: this.state.m_url,
-            subtype: this.state.subtype
+            m_subtype: this.state.m_subtype
         }
         this.props.updateTypes(newType, (success) =>{
             if(success){
@@ -101,7 +104,7 @@ export class Type extends Component {
         
         const newType = {
             ...this.props.type,
-            subtype: removeFromArray(this.props.type.subtype, subtype.m_subtype)
+            m_subtype: removeFromArray(this.props.type.m_subtype, subtype.m_subtype)
         }
         
         this.props.deleteSubtypes(subtype);
@@ -114,7 +117,7 @@ export class Type extends Component {
         
         const newType = {
             ...this.props.type,
-            subtype: [...this.props.type.subtype, subtype.m_subtype]
+            m_subtype: [...this.props.type.m_subtype, subtype.m_subtype]
         }
         this.props.postSubtypes(subtype, (success) => {
             if(success) {
@@ -143,7 +146,7 @@ export class Type extends Component {
                     m_type:this.state.m_type,
                     m_url:this.state.m_url,
                     m_description:this.state.m_description,
-                    subtype:this.state.subtype,
+                    m_subtype:this.state.m_subtype,
                 }
             });
         } 
@@ -154,7 +157,7 @@ export class Type extends Component {
                 m_type:this.state.prevState.m_type,
                 m_url:this.state.prevState.m_url,
                 m_description:this.state.prevState.m_description,
-                subtype:this.state.prevState.subtype,
+                m_subtype:this.state.prevState.m_subtype,
                 prevState: {}
             });
         }
@@ -182,20 +185,27 @@ export class Type extends Component {
         this.props.deleteTypes(this.props.type);
     }
         
+    
+    changeInputFile = (e) => {
+        if( !isValid(e.target.files) || e.target.files.length === 0){
+            return
+        }
+        var file = e.target.files[0];
+        console.log(file)
+        this.props.deletePostS3(file, "types/", "", (success, url)=> {
+            if (success){
+                this.setState({
+                    ...this.state,
+                    m_url : url
+                })
+
+            }
+        })
+    }
 
     render() {
 
-        var actualSubtype = [];
-
-        if (isValid(this.props.type.subtype)){
-            for( var i=0; i < this.props.allSubtypes.length; i++) {
-                if ( blankStringIncludes( this.props.type.subtype , this.props.allSubtypes[i].m_subtype ) ) {
-                    actualSubtype.push(this.props.allSubtypes[i]);
-                }
-            }
-        } 
-        
-        const subtypeDisplayElements = actualSubtype.map( (sub) => (
+        const subtypeDisplayElements = getSubtypeFromType(this.props.type, this.props.allSubtypes).map( (sub) => (
             <Subtypes  key={sub.m_subtype} subtype ={sub} updateType={this.updateType} deleteSubtypesAndUpdateType={this.deleteSubtypesAndUpdateType} ></Subtypes>
             
 
@@ -205,7 +215,12 @@ export class Type extends Component {
 
         const mainJSXShowMode = 
             <React.Fragment>
-                <td className="col-sm-2 border"> <img src={this.props.type.m_url} alt="not found"></img> </td>
+                {/* <td className="col-sm-2 border"> <img src="https://metro-furniture-resource-stash.s3.amazonaws.com/1581809118084-pepe_pika.jpg" alt="not found"></img> </td> */}
+                <td className="col-sm-2 border"> 
+                    <div className="row">
+                        <img className="col-sm-12" src={this.props.type.m_url} alt="not found"></img> 
+                    </div>
+                </td>
                 <td className="col-sm-1 border"> {this.props.type.m_type}</td>
                 <td className="col-sm-2 border"> {this.props.type.m_description}</td>
                 <td className="col-sm-1 boarder">
@@ -234,12 +249,31 @@ export class Type extends Component {
         const mainJSXEditMode = 
             <React.Fragment>
                 
-                <td className="col-sm-2 border"> <img src={this.state.m_url} alt="Upload"></img> </td>
+                <td className="col-sm-2 border"> 
+                    <div className="row">
+                        <img className="col-sm-12"  src={this.state.m_url} alt="Upload"></img>
+                    </div>
+                    <div className="input-group">
+                        <div className="custom-file">
+                            <input
+                            type="file"
+                            className="custom-file-input"
+                            id="inputGroupFile01"
+                            aria-describedby="inputGroupFileAddon01"
+                            onChange ={(e)=>{this.changeInputFile(e) }}
+                            />
+                            <label className="custom-file-label" htmlFor="inputGroupFile01">
+                            Choose file
+                            </label>
+                        </div>
+                    </div>
+                
+                </td>
                 <td className="col-sm-1 border"> 
-                    <input className=""  type="text" name="m_type" value={this.state.m_type} onChange={this.changeField}></input>
+                    <input className="form-control"  type="text" name="m_type" value={this.state.m_type} onChange={this.changeField}></input>
                 </td>
                 <td className="col-sm-2 border">
-                    <input className=""  type="text" name="m_description" value={this.state.m_description} onChange={this.changeField}></input>
+                    <input className="form-control"  type="text" name="m_description" value={this.state.m_description} onChange={this.changeField}></input>
                 </td>
                 <td className="col-sm-1">
                     <button data-toggle="tooltip" data-placement="top" title="Save" onClick={this.fullUpdateType} > Save
@@ -274,7 +308,6 @@ export class Type extends Component {
 }
 
 
-
 Type.propTypes = {
     allSubtypes: PropTypes.array.isRequired,
     type: PropTypes.object.isRequired,
@@ -283,7 +316,9 @@ Type.propTypes = {
     postSubtypes: PropTypes.func.isRequired,
     fetchTypes: PropTypes.func.isRequired,
     deleteUpdateTypes: PropTypes.func.isRequired,
-    deleteTypes: PropTypes.func.isRequired
+    deleteTypes: PropTypes.func.isRequired,
+    fetchProducts: PropTypes.func.isRequired,
+    deletePostS3: PropTypes.func.isRequired,
     // currentTypeEdit: PropTypes.string.isRequired
 }
 
@@ -294,4 +329,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default connect(mapStateToProps, { updateTypes , deleteSubtypes,postSubtypes,deleteUpdateTypes, fetchTypes, deleteTypes})(Type);
+export default connect(mapStateToProps, { updateTypes ,fetchProducts, deleteSubtypes,postSubtypes,deleteUpdateTypes, fetchTypes, deleteTypes,deletePostS3})(Type);

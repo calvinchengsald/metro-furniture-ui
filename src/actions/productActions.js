@@ -124,8 +124,6 @@ export function deleteUpdateProducts(deleteUpdateModel,callbackSuccessfulUpdate)
             
          })
          .catch( error => {
-             
-            console.log(error);
             callbackSuccessfulUpdate(false);
             dispatch({
                 type: actionTypes.MESSAGE_CHANGE,

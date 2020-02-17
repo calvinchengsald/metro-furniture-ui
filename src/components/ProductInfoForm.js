@@ -79,11 +79,11 @@ export class ProductInfoForm extends Component {
                 <td className="col-sm-1"> <div className='input form-control' name="item_code">{this.state.item_code}</div></td>
                 <td className="col-sm-1"> <input className='form-control' type="text" name="base_code" id="input_base_code" onChange={this.onChange} placeholder="base code"></input></td>
                 <td className="col-sm-1"> <input className='form-control' type="text" name="m_size"    id="input_m_size"    onChange={this.onChange} placeholder="size"></input></td>
-                <td className="col-sm-2"> <input className='form-control' type="text" name="m_type"    id="input_m_type"    onChange={this.onChange} placeholder="type"></input></td>
-                <td className="col-sm-2"> <input className='form-control' type="text" name="m_subtype" id="input_m_subtype" onChange={this.onChange} placeholder="subtype"></input></td>
+                <td className="col-sm-1"> <input className='form-control' type="text" name="m_type"    id="input_m_type"    onChange={this.onChange} placeholder="type"></input></td>
+                <td className="col-sm-1"> <input className='form-control' type="text" name="m_subtype" id="input_m_subtype" onChange={this.onChange} placeholder="subtype"></input></td>
                 <td className="col-sm-2"> <input className='form-control' type="text" name="color"     id="input_color"     onChange={this.color} placeholder="color"></input></td>
-                <td className="col-sm-1"> <input className='form-control' type="text" name="notes"     id="input_notes"     onChange={this.onChange} placeholder="notes"></input></td>
-                <td className="col-sm-1"> <input className='form-control' type="text" name="tag"       id="input_tag"       onChange={this.onChangeTag} placeholder="tag"></input></td>
+                <td className="col-sm-2"> <input className='form-control' type="text" name="notes"     id="input_notes"     onChange={this.onChange} placeholder="notes"></input></td>
+                <td className="col-sm-2"> <input className='form-control' type="text" name="tag"       id="input_tag"       onChange={this.onChangeTag} placeholder="tag"></input></td>
 
                 <td> <button  onClick={this.onSubmit}  > Create </button></td>
             </tr>

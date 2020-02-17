@@ -27,7 +27,7 @@ export default function( state=initialState, action) {
                 m_type: action.payload.m_type,
                 m_description: action.payload.m_description,
                 m_url: action.payload.m_url,
-                subtype: action.payload.subtype
+                m_subtype: action.payload.m_subtype
             }
             return {
                 ...state,

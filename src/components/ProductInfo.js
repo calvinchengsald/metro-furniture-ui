@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { isValid, removeFromArray, isValidString, arrayToCSV } from '../utils/standardization';
+import { isValid, removeFromArray, isValidString, arrayToCSV, getSubtypeFromTypeString, blankStringIncludesByKey } from '../utils/standardization';
 import {connect} from 'react-redux' ;
 import {  updateProduct, deleteUpdateProducts, fetchProducts} from '../actions/productActions';
 import PropTypes from 'prop-types';
+import {Dropdown } from 'react-bootstrap';
 
 export class ProductInfo extends Component {
 
@@ -113,6 +114,23 @@ export class ProductInfo extends Component {
             tagString: e.target.value
         });
     }
+    changeFieldFromDropdown = (field, value) => {
+        // if field changed, need to reset subtype as well
+        if(field === "m_type"){
+            this.setState({
+                ...this.state,
+                [field]: value,
+                m_subtype: ""
+            })
+        }
+        else {
+            this.setState({
+                ...this.state,
+                [field]: value
+            })
+
+        }
+    }
 
 
     triggerUpdateProduct = () => {
@@ -204,15 +222,43 @@ export class ProductInfo extends Component {
                 <td className="col-sm-1">{this.props.product.item_code}  </td> 
                 <td className="col-sm-1">{this.props.product.base_code}  </td> 
                 <td className="col-sm-1">{this.props.product.m_size}  </td> 
-                <td className="col-sm-2">{this.props.product.m_type}  </td> 
-                <td className="col-sm-2">{this.props.product.m_subtype}  </td> 
+                <td className="col-sm-1">
+                    { blankStringIncludesByKey( this.props.allTypes,this.props.product.m_type, "m_type"  ) ? 
+                    <div>{this.props.product.m_type}  </div>
+                    :
+                    <React.Fragment>
+                        <span data-toggle="tooltip" data-placement="top" title={"'" +this.props.product.m_type + "' is no longer a valid type"} className='btn-sm btn-danger'>
+                            <svg className="bi bi-alert-triangle-fill" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fillRule="evenodd" d="M9.022 3.566a1.13 1.13 0 011.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H3.144c-.889 0-1.437-.99-.98-1.767L9.022 3.566zM9.002 14a1 1 0 112 0 1 1 0 01-2 0zM10 7a.905.905 0 00-.9.995l.35 3.507a.553.553 0 001.1 0l.35-3.507A.905.905 0 0010 7z" clipRule="evenodd"></path>
+                            </svg>
+                        </span> 
+                        <span>  {this.props.product.m_type}</span> 
+                        
+                    </React.Fragment>
+                    }
+                </td> 
+                <td className="col-sm-1">
+                    { blankStringIncludesByKey( this.props.allSubtypes,this.props.product.m_subtype, "m_subtype"  ) ? 
+                    <div>{this.props.product.m_subtype}  </div>
+                    :
+                    <React.Fragment>
+                        <span data-toggle="tooltip" data-placement="top" title={"'" +this.props.product.m_subtype + "' is no longer a valid subtype"} className='btn-sm btn-danger'>
+                            <svg className="bi bi-alert-triangle-fill" width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fillRule="evenodd" d="M9.022 3.566a1.13 1.13 0 011.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H3.144c-.889 0-1.437-.99-.98-1.767L9.022 3.566zM9.002 14a1 1 0 112 0 1 1 0 01-2 0zM10 7a.905.905 0 00-.9.995l.35 3.507a.553.553 0 001.1 0l.35-3.507A.905.905 0 0010 7z" clipRule="evenodd"></path>
+                            </svg>
+                        </span> 
+                        <span>  {this.props.product.m_subtype}</span> 
+                        
+                    </React.Fragment>
+                    }
+                </td> 
                 <td className="col-sm-2">{ isValid(this.props.product.color)? this.props.product.color.map((color)=>{
                         return color.color;
                     }): "N/A" 
                     }   
                 </td> 
-                <td className="col-sm-1">{this.props.product.notes}  </td> 
-                <td className="col-sm-1">{this.props.product.tag}  </td> 
+                <td className="col-sm-2">{this.props.product.notes}  </td> 
+                <td className="col-sm-2">{this.props.product.tag}  </td> 
                 <td className="col-sm-1"> 
                     <div className="row">
                         <button onClick={() => this.toggleEditMode(true, false)}  > 
@@ -233,15 +279,45 @@ export class ProductInfo extends Component {
                 <td className="col-sm-1"> <div className='input form-control' name="item_code">{this.state.item_code}</div></td> 
                 <td className='col-sm-1' ><input className='form-control' type="text" name="base_code" value={this.state.base_code} onChange={this.changeField}></input></td>
                 <td className='col-sm-1' ><input className='form-control' type="text" name="m_size" value={this.state.m_size} onChange={this.changeField}></input></td>
-                <td className='col-sm-2' ><input className='form-control' type="text" name="m_type" value={this.state.m_type} onChange={this.changeField}></input></td>
-                <td className='col-sm-2' ><input className='form-control' type="text" name="m_subtype" value={this.state.m_subtype} onChange={this.changeField}></input></td>
+                <td className='col-sm-1' >
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            {this.state.m_type}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                        {/* {this.props.specificSubtypes.map((subtype) => (
+                            <Dropdown.Item key={subtype.m_type} name={type.m_type} onClick={(e)=>this.updateType(e)}>{type.m_type}</Dropdown.Item>
+                        ))} */}
+                        {/* specificSubtypes={getSubtypeFromTypeString(data.m_type, this.props.types, this.props.subtypes)} */}
+                        {this.props.allTypes.map((type) => (
+                            <Dropdown.Item className={this.state.m_type===type.m_type?"bg-primary":""} key={type.m_type} name="m_type"  onClick={()=>this.changeFieldFromDropdown( "m_type",type.m_type)}>{type.m_type}</Dropdown.Item>
+                        ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </td>
+                <td className='col-sm-1' >
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            {this.state.m_subtype}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                        { getSubtypeFromTypeString(this.state.m_type, this.props.allTypes, this.props.allSubtypes).map((subtype) => (
+                            <Dropdown.Item className={this.state.subtype===subtype.m_subtype?"bg-primary":""} key={subtype.m_subtype} name="m_subtype"  onClick={()=>this.changeFieldFromDropdown( "m_subtype",subtype.m_subtype)}>{subtype.m_subtype}</Dropdown.Item>
+                        ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </td>
+
+                {/* <td><input className='form-control' type="text" name="m_type" value={this.state.m_type} onChange={this.changeField}></input></td>
+                <td className='col-sm-2' ><input className='form-control' type="text" name="m_subtype" value={this.state.m_subtype} onChange={this.changeField}></input></td> */}
+                
                 <td className='col-sm-2' >{ isValid(this.props.product.color)? this.props.product.color.map((color)=>{
                         return color.color;
                     }): "N/A" 
                     }   
                 </td> 
-                <td className='col-sm-1'><input className='form-control'  type="text" name="notes" value={this.state.notes} onChange={this.changeField}></input></td>
-                <td className='col-sm-1'><input className='form-control'  type="text" name="tag" value={this.state.tagString} onChange={this.onChangeTag}></input></td>
+                <td className='col-sm-2'><input className='form-control'  type="text" name="notes" value={this.state.notes} onChange={this.changeField}></input></td>
+                <td className='col-sm-2'><input className='form-control'  type="text" name="tag" value={this.state.tagString} onChange={this.onChangeTag}></input></td>
                 <td className="col-sm-1"> 
                     <div className="row">
                         <button data-toggle="tooltip" data-placement="top" title="Save" onClick={this.triggerUpdateProduct} > Save
@@ -273,7 +349,9 @@ export class ProductInfo extends Component {
 ProductInfo.propTypes = {
     updateProduct: PropTypes.func.isRequired,
     deleteUpdateProducts: PropTypes.func.isRequired,
-    fetchProducts: PropTypes.func.isRequired
+    fetchProducts: PropTypes.func.isRequired,
+    allSubtypes: PropTypes.array.isRequired,
+    allTypes: PropTypes.array.isRequired,
     
 }
 

@@ -44,7 +44,7 @@ class Inventory extends Component {
     getParentlessSubtypes = () => {
         var parentfulSubtypes = [];
         for (var index in this.props.types) {
-            parentfulSubtypes =parentfulSubtypes.concat(this.props.types[index].subtype);
+            parentfulSubtypes =parentfulSubtypes.concat(this.props.types[index].m_subtype);
         }
         var parentlessSubtypes = [];
         for (var index2 in this.props.subtypes) {
@@ -66,7 +66,7 @@ class Inventory extends Component {
         ));
         const products = insertionSort(this.props.products).map( data => (
             <ProductInfo key={data.item_code} product={data} recentAddItemCode={this.props.recentAddItemCode} removeRecentAdd={this.props.removeRecentAdd} 
-                deleteProduct={this.props.deleteProduct}
+                deleteProduct={this.props.deleteProduct} allTypes ={this.props.types} allSubtypes = {this.props.subtypes}
             >
             </ProductInfo>
         ));
@@ -141,11 +141,11 @@ class Inventory extends Component {
                                 <th className="col-sm-1">Item Code</th>
                                 <th className="col-sm-1">Base Code</th>
                                 <th className="col-sm-1">Size </th>
-                                <th className="col-sm-2">Type </th>
-                                <th className="col-sm-2">Subtype </th>
+                                <th className="col-sm-1">Type </th>
+                                <th className="col-sm-1">Subtype </th>
                                 <th className="col-sm-2">Color </th>
-                                <th className="col-sm-1">Notes </th>
-                                <th className="col-sm-1">Tags </th>
+                                <th className="col-sm-2">Notes </th>
+                                <th className="col-sm-2">Tags </th>
                                 <th className="col-sm-1">Action</th>
                             </tr>
                         </thead>
