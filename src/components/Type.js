@@ -287,8 +287,8 @@ export class Type extends Component {
         ;
         
         return (
-
-            <tr className="row">
+            <tr className= { this.props.recentAddType===this.props.type.m_type?"bg-warning row":"row"}   
+                 onMouseLeave= {this.props.recentAddType===this.props.type.m_type? this.props.removeRecentType : null}  >
                 {this.state.editMode? mainJSXEditMode: mainJSXShowMode}
                 <td className="col-sm-6 border"> 
                     {subtypeDisplayElements}
@@ -319,6 +319,7 @@ Type.propTypes = {
     deleteTypes: PropTypes.func.isRequired,
     fetchProducts: PropTypes.func.isRequired,
     deletePostS3: PropTypes.func.isRequired,
+    removeRecentType: PropTypes.func.isRequired,
     // currentTypeEdit: PropTypes.string.isRequired
 }
 

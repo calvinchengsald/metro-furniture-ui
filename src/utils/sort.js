@@ -90,6 +90,35 @@ export function sortType(arr)
 }
 
 
+export function sortObjectArrayByKey(arr, sortKey)
+{
+  for (var i = 1; i < arr.length; i++) 
+  {
+    if (arr[i][sortKey] < arr[0][sortKey]) 
+    {
+      //move current element to the first position
+      arr.unshift(arr.splice(i,1)[0]);
+    } 
+    else if (arr[i][sortKey] > arr[i-1][sortKey]) 
+    {
+      //leave current element where it is
+      continue;
+    } 
+    else {
+      //find where element should go
+      for (var j = 1; j < i; j++) {
+        if (arr[i][sortKey] > arr[j-1][sortKey] && arr[i][sortKey] < arr[j][sortKey]) 
+        {
+          //move element
+          arr.splice(j,0,arr.splice(i,1)[0]);
+        }
+      }
+    }
+  }
+  return arr;
+}
+
+
 export function bubbleSort (list)  {
     var dummy = "";
     var counter=1;

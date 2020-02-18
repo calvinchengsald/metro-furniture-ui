@@ -3,7 +3,7 @@ import ProductInfo from './ProductInfo'
 import {connect} from 'react-redux' ;
 import { fetchProducts, removeRecentAdd,deleteProduct  } from '../actions/productActions';
 import PropTypes from 'prop-types';
-import { fetchTypes,fetchSubtypes  } from '../actions/typeActions';
+import { fetchTypes,fetchSubtypes ,removeRecentType } from '../actions/typeActions';
 import ProductInfoForm from './ProductInfoForm';
 import TypeForm from './TypeForm';
 import Subtypes from './Subtypes';
@@ -56,6 +56,7 @@ class Inventory extends Component {
         return parentlessSubtypes;
 
     }
+
     
 
     render() {
@@ -72,7 +73,7 @@ class Inventory extends Component {
         ));
         
         const types = sortType(this.props.types).map( data => (
-            <Type key={data.m_type} type={data} allSubtypes ={this.props.subtypes}
+            <Type key={data.m_type} type={data} allSubtypes ={this.props.subtypes} recentAddType={this.props.recentAddType} removeRecentType={this.props.removeRecentType}
 
             >
             </Type>
@@ -169,6 +170,7 @@ Inventory.propTypes = {
     fetchSubtypes: PropTypes.func.isRequired,
     products: PropTypes.array.isRequired,
     removeRecentAdd: PropTypes.func.isRequired,
+    removeRecentType: PropTypes.func.isRequired,
     subtypes: PropTypes.array.isRequired,
     types: PropTypes.array.isRequired
 }
@@ -182,7 +184,8 @@ const mapStateToProps = state => ({
     products: state.productReducer.products,
     types: state.typeReducer.types,
     recentAddItemCode: state.productReducer.recentAddItemCode,
+    recentAddType: state.typeReducer.recentAddType,
     subtypes: sortSubtype(state.typeReducer.subtypes)
 });
 
-export default connect(mapStateToProps, {fetchProducts,removeRecentAdd,deleteProduct, fetchTypes,fetchSubtypes})(Inventory);
+export default connect(mapStateToProps, {fetchProducts,removeRecentAdd,deleteProduct, fetchTypes,fetchSubtypes,removeRecentType })(Inventory);

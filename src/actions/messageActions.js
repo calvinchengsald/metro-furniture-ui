@@ -12,3 +12,26 @@ export function closeMessageAction() {
     }
     
 }
+
+
+
+export function throwMessageAction(message_type,message) {
+
+    var payload = {
+        response: {
+            data: {
+                status: message_type,
+                message: message
+            }
+        }
+    }
+
+    return function(dispatch) {
+        dispatch({
+            type: actionTypes.MESSAGE_CHANGE,
+            payload: payload
+        })
+    }
+    
+}
+

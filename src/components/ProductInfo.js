@@ -1,9 +1,14 @@
 import React, { Component } from 'react'
-import { isValid, removeFromArray, isValidString, arrayToCSV, getSubtypeFromTypeString, blankStringIncludesByKey } from '../utils/standardization';
+import { isValid, removeFromArray, isValidString, arrayToCSV, getSubtypeFromTypeString,distinctOnObjectArrayByKey, blankStringIncludesByKey, getObjectFromArrayByKey, updateObjectFromArrayByKey } from '../utils/standardization';
 import {connect} from 'react-redux' ;
 import {  updateProduct, deleteUpdateProducts, fetchProducts} from '../actions/productActions';
+import {deletePostS3 } from '../actions/s3Actions';
 import PropTypes from 'prop-types';
-import {Dropdown } from 'react-bootstrap';
+import {Dropdown, Modal , Button} from 'react-bootstrap';
+import ColorUrl from './ColorUrl';
+import uuid from 'react-uuid';
+import {sortObjectArrayByKey } from '../utils/sort';
+import {  throwMessageAction } from '../actions/messageActions';
 
 export class ProductInfo extends Component {
 
@@ -12,12 +17,21 @@ export class ProductInfo extends Component {
         this.state = {
             editMode: false,
             comfirmDelete: false,
+            colorModalShow: false,
             item_code: this.props.product.item_code,
             base_code: this.props.product.base_code,
             m_size: this.props.product.m_size,
             m_type: this.props.product.m_type,
             m_subtype: this.props.product.m_subtype,
-            // color: "",
+            color: this.props.product.color,
+            colorModel: isValid(this.props.product.color)? 
+                this.state.color.map( (color) => {
+                    return {
+                        id: uuid(),
+                        color: color.color,
+                        url: color.url
+                    }
+                }) : [],
             notes: this.props.product.notes,
             tag: this.props.product.tag,
             tagString: arrayToCSV(this.props.product.tag),
@@ -28,10 +42,11 @@ export class ProductInfo extends Component {
                 m_size:    "",
                 m_type:    "",
                 m_subtype: "",
-                // color: "",
+                color: [],
+                colorModel : [],
                 notes:     "",
                 tag:       [],
-                tagString: ""
+                tagString: "",
             }
         }
     }
@@ -48,6 +63,13 @@ export class ProductInfo extends Component {
             comfirmDelete: confrimDel
         })
     }
+
+    toggleColorModalShow = (show) => {
+        this.setState({
+            ...this.state,
+            colorModalShow: show
+        })
+    }
     
     toggleEditMode = (editModeBool, resetFields) => {
         if(editModeBool){
@@ -60,7 +82,8 @@ export class ProductInfo extends Component {
                     m_size:    this.state.m_size,
                     m_type:    this.state.m_type,
                     m_subtype: this.state.m_subtype,
-                    // color: ""
+                    color: this.state.color,
+                    colorModel: this.state.colorModel,
                     notes:     this.state.notes,
                     tag:       this.state.tag,
                     tagString: arrayToCSV(this.state.tag)
@@ -76,7 +99,8 @@ export class ProductInfo extends Component {
                 m_size:    resetFields? this.state.prevState.m_size : this.state.m_size,
                 m_type:    resetFields? this.state.prevState.m_type : this.state.m_type,
                 m_subtype: resetFields? this.state.prevState.m_subtype : this.state.m_subtype,
-                // color:  resetFields? this.state.prevState.color : this.state.color,
+                color:     resetFields? this.state.prevState.color : this.state.color,
+                colorModel:     resetFields? this.state.prevState.colorModel : this.state.colorModel,
                 notes:     resetFields? this.state.prevState.notes : this.state.notes,
                 tag:       resetFields? this.state.prevState.tag : this.state.tag,
                 tagString: resetFields? this.state.prevState.tagString : arrayToCSV(this.state.tag)
@@ -132,8 +156,37 @@ export class ProductInfo extends Component {
         }
     }
 
+    //to see if there was a change
+    //color model contains unique ID, need to compare to model...
+    compareColorToColorModel = (color, colorModel) => {
+        //both invalid, nothing to compare nothing changed
+        if( !isValid(colorModel) && !isValid(color) ){
+            return true;
+        }
+        //either invalid but not both, than something changed
+        if( !isValid(colorModel) || !isValid(color) ){
+            return false;
+        }
+        if(color.length !== colorModel.length) {
+            return false;
+        }
+        var colorSorted = sortObjectArrayByKey(color, "color");
+        var colorModelsorted = sortObjectArrayByKey(colorModel, "color");
+        for(var i = 0; i<colorSorted.length; i++){
+            if (colorSorted[i].color !== colorModelsorted[i].color  || colorSorted[i].url !== colorModelsorted[i].url   ){
+                return false;
+            }
+        }
+        return true;
+    }
 
     triggerUpdateProduct = () => {
+
+       //check color model, error if duplicate on color
+       if (!distinctOnObjectArrayByKey(this.state.colorModel, "color") ) {
+            this.props.throwMessageAction("Error", "Cannot have duplicate colors for the same item. Please use a different color name");
+            return ;
+        }
 
         
         // is there really any update?
@@ -142,7 +195,7 @@ export class ProductInfo extends Component {
             this.props.product.m_size.trim() === this.state.m_size.trim() &&
             this.props.product.m_type.trim() === this.state.m_type.trim() &&
             this.props.product.m_subtype.trim() === this.state.m_subtype.trim() &&
-            // this.props.product.color.trim() === this.state.color.trim() &&
+            this.compareColorToColorModel(this.props.product.color , this.state.colorModel) &&
             this.props.product.notes.trim() === this.state.notes.trim() &&
             arrayToCSV(this.props.product.tag).trim() === this.state.tagString.trim()
             ){
@@ -159,7 +212,7 @@ export class ProductInfo extends Component {
                     m_size : this.state.m_size,
                     m_type: this.state.m_type,
                     m_subtype: this.state.m_subtype,
-                    color: this.state.color,
+                    color: this.state.colorModel,
                     notes: this.state.notes,
                     tag: this.state.tag
                 },
@@ -179,6 +232,7 @@ export class ProductInfo extends Component {
             
         }
 
+        
         //else just a regular update
         const updatedProduct = {
             item_code: this.state.item_code,
@@ -186,11 +240,13 @@ export class ProductInfo extends Component {
             m_size : this.state.m_size,
             m_type: this.state.m_type,
             m_subtype: this.state.m_subtype,
-            color: this.state.color,
+            color: this.state.colorModel,
             notes: this.state.notes,
             tag: this.state.tag
         };
-
+        console.log(this.state.colorModel);
+        console.log("in product update");
+        console.log(updatedProduct);
         this.props.updateProduct(updatedProduct, (success) => {
             if(success){
                 this.toggleEditMode(false, false);
@@ -198,6 +254,51 @@ export class ProductInfo extends Component {
         });
     }
 
+    editColorModel = (uuid, field, value) => {
+        var oldColorModel = getObjectFromArrayByKey(this.state.colorModel, "id", uuid);
+        var newColorModelArray = this.state.colorModel;
+        if(isValid(oldColorModel)){
+            oldColorModel[field] = value;
+            newColorModelArray = updateObjectFromArrayByKey(this.state.colorModel, "id", oldColorModel);
+        }
+        // this is a new entry
+        else {
+            var newlyAddedColorModel = {
+                id: uuid(),
+                [field] : value
+            }
+            newColorModelArray.push(newlyAddedColorModel);
+        }
+        this.setState({
+            ...this.state,
+            colorModel: newColorModelArray
+        })
+    }
+    addNewColorModel = () => {
+        var newColorModelArray = this.state.colorModel;
+        var newlyAddedColorModel = {
+            id: uuid()
+        }
+        newColorModelArray.push(newlyAddedColorModel);
+        this.setState({
+            ...this.state,
+            colorModel: newColorModelArray
+        })
+    }
+    changeInputFileColorModal = (e, uuid) => {
+        if( !isValid(e.target.files) || e.target.files.length === 0){
+            return
+        }
+        var file = e.target.files[0];
+        this.props.deletePostS3(file, this.props.product.m_type + "/" + this.props.product.m_subtype +"/", "", (success, url)=> {
+            console.log(url);
+            if (success){
+                this.editColorModel(uuid, "url", url);
+
+            }
+        })
+    }
+    
 
     render() {
 
@@ -272,6 +373,34 @@ export class ProductInfo extends Component {
                 </td>
             </React.Fragment> ;
         
+        const colorModalFragment = 
+            <React.Fragment>
+                <Button variant="primary" onClick={() => this.toggleColorModalShow(true)}>
+                        Edit Colors
+                </Button>
+                <Modal
+                    size="lg"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered show={this.state.colorModalShow}
+                    onHide={() => this.toggleColorModalShow(false)} >
+                    <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Color
+                    </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    { sortObjectArrayByKey(this.state.colorModel,"id").map( (color) => (
+                        <ColorUrl key={color.id} color={color} editColorModel={(uuid, field, value) => this.editColorModel(uuid, field, value)} changeInputFileColorModal={(e,id)=>this.changeInputFileColorModal(e,id)} > </ColorUrl>
+                    ))
+                    }
+                    <Button onClick={this.addNewColorModel}> New Color </Button>
+                    {/* <ColorUrlForm addColor={this.addColor} > </ColorUrlForm> */}
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button onClick={() => this.toggleColorModalShow(false)} >Close</Button>
+                    </Modal.Footer>
+                </Modal>
+            </React.Fragment>
         
         
         const editModeFragment = 
@@ -308,13 +437,11 @@ export class ProductInfo extends Component {
                     </Dropdown>
                 </td>
 
-                {/* <td><input className='form-control' type="text" name="m_type" value={this.state.m_type} onChange={this.changeField}></input></td>
-                <td className='col-sm-2' ><input className='form-control' type="text" name="m_subtype" value={this.state.m_subtype} onChange={this.changeField}></input></td> */}
-                
                 <td className='col-sm-2' >{ isValid(this.props.product.color)? this.props.product.color.map((color)=>{
                         return color.color;
                     }): "N/A" 
                     }   
+                    {colorModalFragment}  
                 </td> 
                 <td className='col-sm-2'><input className='form-control'  type="text" name="notes" value={this.state.notes} onChange={this.changeField}></input></td>
                 <td className='col-sm-2'><input className='form-control'  type="text" name="tag" value={this.state.tagString} onChange={this.onChangeTag}></input></td>
@@ -352,6 +479,8 @@ ProductInfo.propTypes = {
     fetchProducts: PropTypes.func.isRequired,
     allSubtypes: PropTypes.array.isRequired,
     allTypes: PropTypes.array.isRequired,
+    deletePostS3: PropTypes.func.isRequired,
+    throwMessageAction: PropTypes.func.isRequired,
     
 }
 
@@ -359,5 +488,5 @@ const mapStateToProps = state => ({
     // product: state.productReducer.product
 });
 
-export default connect(mapStateToProps, {updateProduct, deleteUpdateProducts, fetchProducts})(ProductInfo);
+export default connect(mapStateToProps, {updateProduct, deleteUpdateProducts,deletePostS3, fetchProducts, throwMessageAction})(ProductInfo);
 

@@ -31,7 +31,8 @@ export default function( state=initialState, action) {
             }
             return {
                 ...state,
-                types: [...state.types, newType]
+                types: [...state.types, newType],
+                recentAddType: newType.m_type
             }
         
         case actionTypes.TYPE_DELETE :
@@ -40,6 +41,12 @@ export default function( state=initialState, action) {
             return {
                 ...state,
                 types: newTypes2
+            }
+        
+        case actionTypes.TYPE_REMOVE_RECENT_ADD :
+            return {
+                ...state,
+                recentAddType: ""
             }
         case actionTypes.SUBTYPE_FETCH :
             return {
@@ -73,7 +80,6 @@ export default function( state=initialState, action) {
                 ...state,
                 subtypes: [...state.subtypes, newSubtype]
             }
-        
         default: return state;
     }
 }

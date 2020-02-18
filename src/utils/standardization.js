@@ -50,6 +50,15 @@ export function updateObjectFromArrayByKey(array, primaryKeyName , updatedElemen
     return newArray;
 }
 
+export function getObjectFromArrayByKey(array, primaryKeyName , primaryKeyValue) {
+    for ( var i = 0; i < array.length; i++) {
+        if (array[i][primaryKeyName] === primaryKeyValue) {
+            return array[i] ;
+        }
+    }
+    return null;
+}
+
 export function objectStandardizer( object , objectMapping ) {
 
     var standardizedObject = {};
@@ -67,6 +76,22 @@ export function objectStandardizer( object , objectMapping ) {
         }
     }
     return standardizedObject
+}
+
+//returns true if the given key is unique for this object array
+export function distinctOnObjectArrayByKey(array, key){
+
+    console.log("cheking");
+    console.log("array");
+    var keyHolder = [];
+    for (var i=0; i< array.length; i++){
+        if(isValid(keyHolder[array[i][key].trim()]) ){
+            return false;
+        }
+        keyHolder[array[i][key].trim()] = "occupied";
+    }
+    console.log(keyHolder);
+    return true;
 }
 
 // normal includes will not do anything to the existing string.

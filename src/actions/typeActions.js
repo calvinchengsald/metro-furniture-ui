@@ -260,3 +260,16 @@ export function deleteSubtypes(subtype) {
     }
     
 }
+
+
+export function removeRecentType() {
+
+    return function(dispatch) {
+        dispatch({
+            type: actionTypes.TYPE_REMOVE_RECENT_ADD,
+            payload: ""
+        })
+    }
+    
+}
+
