@@ -90,8 +90,10 @@ export function sortType(arr)
 }
 
 
+// if object is null, remove it from the list
 export function sortObjectArrayByKey(arr, sortKey)
 {
+  arr = arr.filter( (data) => data!==null);
   for (var i = 1; i < arr.length; i++) 
   {
     if (arr[i][sortKey] < arr[0][sortKey]) 

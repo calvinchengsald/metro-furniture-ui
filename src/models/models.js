@@ -6,7 +6,7 @@ export const modelAttributeMapping = {
         m_size: "string",
         m_type: "string",
         m_subtype: "string",
-        // color: "array",
+        color: "arrayStringObject",
         notes: "string",
         tag: "array"
     },

@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import { isValid, removeFromArray, isValidString, arrayToCSV, getSubtypeFromTypeString,distinctOnObjectArrayByKey, blankStringIncludesByKey, getObjectFromArrayByKey, updateObjectFromArrayByKey } from '../utils/standardization';
+import { isValid, removeFromArray, isValidString, arrayToCSV,getSubtypeFromTypeString,distinctOnObjectArrayByKey, blankStringIncludesByKey,cloneObjectArray, getObjectFromArrayByKey, updateObjectFromArrayByKey } from '../utils/standardization';
 import {connect} from 'react-redux' ;
 import {  updateProduct, deleteUpdateProducts, fetchProducts} from '../actions/productActions';
 import {deletePostS3 } from '../actions/s3Actions';
 import PropTypes from 'prop-types';
 import {Dropdown, Modal , Button} from 'react-bootstrap';
 import ColorUrl from './ColorUrl';
-import uuid from 'react-uuid';
 import {sortObjectArrayByKey } from '../utils/sort';
 import {  throwMessageAction } from '../actions/messageActions';
 
@@ -14,6 +13,7 @@ export class ProductInfo extends Component {
 
     constructor(props){
         super(props);
+        var colorCounter = 0;
         this.state = {
             editMode: false,
             comfirmDelete: false,
@@ -25,13 +25,14 @@ export class ProductInfo extends Component {
             m_subtype: this.props.product.m_subtype,
             color: this.props.product.color,
             colorModel: isValid(this.props.product.color)? 
-                this.state.color.map( (color) => {
+                this.props.product.color.map( (color) => {
                     return {
-                        id: uuid(),
+                        id: colorCounter++,
                         color: color.color,
                         url: color.url
                     }
                 }) : [],
+            colorCounter : colorCounter,
             notes: this.props.product.notes,
             tag: this.props.product.tag,
             tagString: arrayToCSV(this.props.product.tag),
@@ -47,6 +48,7 @@ export class ProductInfo extends Component {
                 notes:     "",
                 tag:       [],
                 tagString: "",
+                colorCounter: colorCounter,
             }
         }
     }
@@ -82,15 +84,17 @@ export class ProductInfo extends Component {
                     m_size:    this.state.m_size,
                     m_type:    this.state.m_type,
                     m_subtype: this.state.m_subtype,
-                    color: this.state.color,
-                    colorModel: this.state.colorModel,
+                    color:  this.state.color,
+                    colorModel: cloneObjectArray(this.state.colorModel),
                     notes:     this.state.notes,
                     tag:       this.state.tag,
-                    tagString: arrayToCSV(this.state.tag)
+                    tagString: arrayToCSV(this.state.tag),
+                    colorCounter:       this.state.colorCounter,
                 }
             })
         }
         else {
+            console.log("resetting fields " + resetFields);
             this.setState({
                 ...this.state,
                 editMode: editModeBool,
@@ -103,7 +107,8 @@ export class ProductInfo extends Component {
                 colorModel:     resetFields? this.state.prevState.colorModel : this.state.colorModel,
                 notes:     resetFields? this.state.prevState.notes : this.state.notes,
                 tag:       resetFields? this.state.prevState.tag : this.state.tag,
-                tagString: resetFields? this.state.prevState.tagString : arrayToCSV(this.state.tag)
+                tagString: resetFields? this.state.prevState.tagString : arrayToCSV(this.state.tag),
+                colorCounter:       resetFields? this.state.prevState.colorCounter : this.state.colorCounter,
             })
         }
     }
@@ -180,6 +185,13 @@ export class ProductInfo extends Component {
         return true;
     }
 
+    // colorModel can have null objects inside, need to convert to just color object used in the request
+    convertColorModelToColor = () => {
+        // var modelClone = cloneObjectArray(this.state.colorModel);
+
+        return this.state.colorModel.filter((data) => data!==null);
+    }
+
     triggerUpdateProduct = () => {
 
        //check color model, error if duplicate on color
@@ -187,7 +199,7 @@ export class ProductInfo extends Component {
             this.props.throwMessageAction("Error", "Cannot have duplicate colors for the same item. Please use a different color name");
             return ;
         }
-
+        var convertedColorModel = this.convertColorModelToColor();
         
         // is there really any update?
         if( this.props.product.item_code.trim() ===  this.state.item_code.trim() &&
@@ -195,7 +207,7 @@ export class ProductInfo extends Component {
             this.props.product.m_size.trim() === this.state.m_size.trim() &&
             this.props.product.m_type.trim() === this.state.m_type.trim() &&
             this.props.product.m_subtype.trim() === this.state.m_subtype.trim() &&
-            this.compareColorToColorModel(this.props.product.color , this.state.colorModel) &&
+            this.compareColorToColorModel(this.props.product.color , convertedColorModel) &&
             this.props.product.notes.trim() === this.state.notes.trim() &&
             arrayToCSV(this.props.product.tag).trim() === this.state.tagString.trim()
             ){
@@ -212,7 +224,7 @@ export class ProductInfo extends Component {
                     m_size : this.state.m_size,
                     m_type: this.state.m_type,
                     m_subtype: this.state.m_subtype,
-                    color: this.state.colorModel,
+                    color: convertedColorModel,
                     notes: this.state.notes,
                     tag: this.state.tag
                 },
@@ -240,13 +252,10 @@ export class ProductInfo extends Component {
             m_size : this.state.m_size,
             m_type: this.state.m_type,
             m_subtype: this.state.m_subtype,
-            color: this.state.colorModel,
+            color: convertedColorModel,
             notes: this.state.notes,
             tag: this.state.tag
         };
-        console.log(this.state.colorModel);
-        console.log("in product update");
-        console.log(updatedProduct);
         this.props.updateProduct(updatedProduct, (success) => {
             if(success){
                 this.toggleEditMode(false, false);
@@ -254,20 +263,22 @@ export class ProductInfo extends Component {
         });
     }
 
+    deleteColorModel = (uuid) => {
+        var newColorModelArray = this.state.colorModel;
+        newColorModelArray[uuid] = null;
+        this.setState({
+            ...this.state,
+            colorModel: newColorModelArray
+        });
+        // this.colorModel
+    }
+
     editColorModel = (uuid, field, value) => {
-        var oldColorModel = getObjectFromArrayByKey(this.state.colorModel, "id", uuid);
+        var oldColorModel = this.state.colorModel[uuid];
         var newColorModelArray = this.state.colorModel;
         if(isValid(oldColorModel)){
             oldColorModel[field] = value;
-            newColorModelArray = updateObjectFromArrayByKey(this.state.colorModel, "id", oldColorModel);
-        }
-        // this is a new entry
-        else {
-            var newlyAddedColorModel = {
-                id: uuid(),
-                [field] : value
-            }
-            newColorModelArray.push(newlyAddedColorModel);
+            newColorModelArray[uuid] = oldColorModel;
         }
         this.setState({
             ...this.state,
@@ -277,13 +288,15 @@ export class ProductInfo extends Component {
     addNewColorModel = () => {
         var newColorModelArray = this.state.colorModel;
         var newlyAddedColorModel = {
-            id: uuid()
+            id: this.state.colorCounter
         }
         newColorModelArray.push(newlyAddedColorModel);
         this.setState({
             ...this.state,
-            colorModel: newColorModelArray
+            colorModel: newColorModelArray,
+            colorCounter: this.state.colorCounter + 1,
         })
+
     }
     changeInputFileColorModal = (e, uuid) => {
         if( !isValid(e.target.files) || e.target.files.length === 0){
@@ -353,13 +366,17 @@ export class ProductInfo extends Component {
                     </React.Fragment>
                     }
                 </td> 
-                <td className="col-sm-2">{ isValid(this.props.product.color)? this.props.product.color.map((color)=>{
-                        return color.color;
-                    }): "N/A" 
+                <td className="col-sm-2">{ isValid(this.props.product.color)? this.props.product.color.map((color)=>(
+                        <div className="btn btn-outline-primary" >{color.color}</div>
+                    )): "N/A" 
                     }   
                 </td> 
                 <td className="col-sm-2">{this.props.product.notes}  </td> 
-                <td className="col-sm-2">{this.props.product.tag}  </td> 
+                <td className="col-sm-2">{ isValid(this.props.product.tag)? this.props.product.tag.map((tag)=>{
+                        return tag===null? "" : <div className="btn btn-outline-primary" >{tag}</div>
+                    }): "N/A" 
+                    }   
+                </td> 
                 <td className="col-sm-1"> 
                     <div className="row">
                         <button onClick={() => this.toggleEditMode(true, false)}  > 
@@ -390,7 +407,7 @@ export class ProductInfo extends Component {
                     </Modal.Header>
                     <Modal.Body>
                     { sortObjectArrayByKey(this.state.colorModel,"id").map( (color) => (
-                        <ColorUrl key={color.id} color={color} editColorModel={(uuid, field, value) => this.editColorModel(uuid, field, value)} changeInputFileColorModal={(e,id)=>this.changeInputFileColorModal(e,id)} > </ColorUrl>
+                        <ColorUrl key={color.id} color={color} deleteColorModel={(uuid)=>this.deleteColorModel(uuid)} editColorModel={(uuid, field, value) => this.editColorModel(uuid, field, value)} changeInputFileColorModal={(e,id)=>this.changeInputFileColorModal(e,id)} > </ColorUrl>
                     ))
                     }
                     <Button onClick={this.addNewColorModel}> New Color </Button>
@@ -437,10 +454,11 @@ export class ProductInfo extends Component {
                     </Dropdown>
                 </td>
 
-                <td className='col-sm-2' >{ isValid(this.props.product.color)? this.props.product.color.map((color)=>{
-                        return color.color;
+                <td className="col-sm-2">{ isValid(this.state.colorModel)? this.state.colorModel.map((color)=>{
+                        return color===null? "" : <div className="btn btn-outline-primary" >{color.color}</div>
                     }): "N/A" 
                     }   
+                    
                     {colorModalFragment}  
                 </td> 
                 <td className='col-sm-2'><input className='form-control'  type="text" name="notes" value={this.state.notes} onChange={this.changeField}></input></td>

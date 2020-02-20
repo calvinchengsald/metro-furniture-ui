@@ -8,6 +8,7 @@ export function isValid (value) {
     return value!==undefined && value!==null;
 }
 
+
 export function coalesceString(value, defaultString) {
     if (value===undefined || value ===null ) {
         return defaultString;
@@ -70,6 +71,9 @@ export function objectStandardizer( object , objectMapping ) {
             case "array" :
                 standardizedObject[key] = isValid(object[key])?object[key]: [] ;
                 break;
+            case "arrayStringObject" :
+                standardizedObject[key] = isValid(object[key])?object[key]: [] ;
+                break;
             default:
                 standardizedObject[key] = object[key]
 
@@ -79,18 +83,17 @@ export function objectStandardizer( object , objectMapping ) {
 }
 
 //returns true if the given key is unique for this object array
+//if object is null , ignore
 export function distinctOnObjectArrayByKey(array, key){
 
-    console.log("cheking");
-    console.log("array");
     var keyHolder = [];
     for (var i=0; i< array.length; i++){
+        if(array[i] === null) continue;
         if(isValid(keyHolder[array[i][key].trim()]) ){
             return false;
         }
         keyHolder[array[i][key].trim()] = "occupied";
     }
-    console.log(keyHolder);
     return true;
 }
 
@@ -155,4 +158,25 @@ export function getSubtypeFromTypeString(targetTypeString, allTypes, allSubtypes
         return [];
     }
     return getSubtypeFromType(targetTypeArr[0], allSubtypes);
+}
+
+export function cloneObjectArray(array) {
+    if(!isValid(array) || !Array.isArray(array)){
+        return [];
+    }
+    var cloneArray = [];
+    for(var i=0; i < array.length; i++){
+        var newObj = {};
+        if(array[i] === null){
+
+        }
+        else {
+            for(var keys in array[i]){
+                newObj[keys] = array[i][keys];
+            }
+        }
+        cloneArray[i] = newObj;
+    }
+
+    return cloneArray;
 }

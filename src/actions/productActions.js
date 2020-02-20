@@ -10,6 +10,7 @@ export function fetchProducts() {
          axios.get( basePath +'/product/all')
          .then(res => {
              
+            
             res.data.content = res.data.content.map((data) => {
                 return objectStandardizer(data, modelAttributeMapping.PRODUCT_INFO_MODEL);
             });

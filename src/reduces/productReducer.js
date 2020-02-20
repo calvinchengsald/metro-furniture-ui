@@ -20,6 +20,7 @@ export default function( state=initialState, action) {
                 m_size: action.payload.m_size,
                 m_type: action.payload.m_type,
                 m_subtype: action.payload.m_subtype,
+                color: action.payload.color,
                 notes: action.payload.notes,
                 tag: action.payload.tag
             }
@@ -36,6 +37,7 @@ export default function( state=initialState, action) {
                 m_size: action.payload.m_size,
                 m_type: action.payload.m_type,
                 m_subtype: action.payload.m_subtype,
+                color: action.payload.color,
                 notes: action.payload.notes,
                 tag: action.payload.tag
             };
