@@ -11,14 +11,25 @@ import {insertionSort, sortType, sortSubtype} from '../utils/sort'
 import {Link} from 'react-router-dom';
 import {  Route} from 'react-router-dom';
 import Type from './Type';
-import {blankStringIncludes} from '../utils/standardization';
+import {blankStringIncludes, isValid, isValidString} from '../utils/standardization';
+import {Button} from 'react-bootstrap';
 
 class Inventory extends Component {
 
     constructor(props){
         super(props);
         this.state = {
-            typeEditMode: false
+            typeEditMode: false,
+            filter : {
+                item_code: "",
+                base_code: "",
+                m_size: "",
+                m_type: "",
+                m_subtype: "",
+                color: "",
+                notes: "",
+                tag: "",
+            }
         }
     }
     componentDidMount() {
@@ -57,15 +68,54 @@ class Inventory extends Component {
 
     }
 
-    
+    clearFilters = () => {
+        this.setState({
+            ...this.state,
+            filter : {
+                item_code: "",
+                base_code: "",
+                m_size: "",
+                m_type: "",
+                m_subtype: "",
+                color: "",
+                notes: "",
+                tag: "",
+            }
+        })
+    }
+    filterProducts = () => {
+        var products = this.props.products;
+        products = isValidString(this.state.filter.item_code)? products.filter((data)=> isValid(data.item_code) &&  data.item_code.includes(this.state.filter.item_code) ) : products;
+        products = isValidString(this.state.filter.base_code)? products.filter((data)=> isValid(data.base_code) &&  data.base_code.includes(this.state.filter.base_code) ) : products;
+        products = isValidString(this.state.filter.m_size)? products.filter((data)=> isValid(data.m_size) &&  data.m_size.includes(this.state.filter.m_size) ) : products;
+        products = isValidString(this.state.filter.m_type)? products.filter((data)=> isValid(data.m_type) &&  data.m_type.includes(this.state.filter.m_type) ) : products;
+        products = isValidString(this.state.filter.m_subtype)? products.filter((data)=> isValid(data.m_subtype) &&  data.m_subtype.includes(this.state.filter.m_subtype) ) : products;
+        products = isValidString(this.state.filter.notes)? products.filter((data)=> isValid(data.notes) &&  data.notes.includes(this.state.filter.notes) ) : products;
+        products = isValidString(this.state.filter.tag)? products.filter((data)=> isValid(data.tag) &&  data.tag.filter((tagObj) => tagObj.includes(this.state.filter.tag)).length>0 ) : products;
+        products = isValidString(this.state.filter.color)? products.filter((data)=> isValid(data.color) && data.color.filter((colorObj) => isValid(colorObj) && isValid(colorObj.color) && colorObj.color.includes(this.state.filter.color)).length>0 ) : products;
+
+        return products;
+    }
+    onChangeFilter = (e) =>{
+        var newFilter = {
+            ...this.state.filter,
+            [e.target.name]: e.target.value
+        };
+        this.setState({
+            ...this.state,
+            filter: newFilter
+        })
+    }
 
     render() {
+        
+
         const parentlessSubtypes = this.getParentlessSubtypes().map( sub => (
             
             <Subtypes  key={sub.m_subtype} subtype ={sub} parentless={true} types={this.props.types}></Subtypes>
 
         ));
-        const products = insertionSort(this.props.products).map( data => (
+        const products = insertionSort(this.filterProducts()).map( data => (
             <ProductInfo key={data.item_code} product={data} recentAddItemCode={this.props.recentAddItemCode} removeRecentAdd={this.props.removeRecentAdd} 
                 deleteProduct={this.props.deleteProduct} allTypes ={this.props.types} allSubtypes = {this.props.subtypes}
             >
@@ -151,6 +201,18 @@ class Inventory extends Component {
                             </tr>
                         </thead>
                         <tbody>
+                            <tr className="row">
+                                <td className="col-sm-1"> <input className='form-control' value={this.state.filter.item_code} type="text" name="item_code" onChange={this.onChangeFilter} placeholder="base code"></input></td>
+                                <td className="col-sm-1"> <input className='form-control' value={this.state.filter.base_code} type="text" name="base_code" onChange={this.onChangeFilter} placeholder="base code"></input></td>
+                                <td className="col-sm-1"> <input className='form-control' value={this.state.filter.m_size} type="text" name="m_size"    onChange={this.onChangeFilter} placeholder="size"></input></td>
+                                <td className="col-sm-1"> <input className='form-control' value={this.state.filter.m_type} type="text" name="m_type"    onChange={this.onChangeFilter} placeholder="type"></input></td>
+                                <td className="col-sm-1"> <input className='form-control' value={this.state.filter.m_subtype} type="text" name="m_subtype" onChange={this.onChangeFilter} placeholder="subtype"></input></td>
+                                <td className="col-sm-2"> <input className='form-control' value={this.state.filter.color} type="text" name="color"     onChange={this.onChangeFilter} placeholder="color"></input></td>
+                                <td className="col-sm-2"> <input className='form-control' value={this.state.filter.notes} type="text" name="notes"     onChange={this.onChangeFilter} placeholder="notes"></input></td>
+                                <td className="col-sm-2"> <input className='form-control' value={this.state.filter.tag} type="text" name="tag"       onChange={this.onChangeFilter} placeholder="tag"></input></td>
+
+                                <td className="col-sm-1"> <Button className="btn btn-primary" onClick={this.clearFilters} >Clear Filter</Button></td> 
+                            </tr>
                             {products}
                             <ProductInfoForm></ProductInfoForm>
                         </tbody>

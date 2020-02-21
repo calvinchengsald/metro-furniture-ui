@@ -89,6 +89,9 @@ export function distinctOnObjectArrayByKey(array, key){
     var keyHolder = [];
     for (var i=0; i< array.length; i++){
         if(array[i] === null) continue;
+        if(!isValidString(array[i][key]) ){
+            return false
+        }
         if(isValid(keyHolder[array[i][key].trim()]) ){
             return false;
         }
@@ -96,6 +99,7 @@ export function distinctOnObjectArrayByKey(array, key){
     }
     return true;
 }
+
 
 // normal includes will not do anything to the existing string.
 // due to bad data, we may need to trim all strings before checking for include comparison

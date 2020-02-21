@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { isValid, removeFromArray, isValidString, arrayToCSV,getSubtypeFromTypeString,distinctOnObjectArrayByKey, blankStringIncludesByKey,cloneObjectArray, getObjectFromArrayByKey, updateObjectFromArrayByKey } from '../utils/standardization';
+import { isValid, removeFromArray, isValidString, arrayToCSV,getSubtypeFromTypeString,distinctOnObjectArrayByKey, blankStringIncludesByKey,cloneObjectArray } from '../utils/standardization';
 import {connect} from 'react-redux' ;
 import {  updateProduct, deleteUpdateProducts, fetchProducts} from '../actions/productActions';
 import {deletePostS3 } from '../actions/s3Actions';
@@ -94,7 +94,7 @@ export class ProductInfo extends Component {
             })
         }
         else {
-            console.log("resetting fields " + resetFields);
+            // console.log("resetting fields " + resetFields);
             this.setState({
                 ...this.state,
                 editMode: editModeBool,
@@ -367,13 +367,13 @@ export class ProductInfo extends Component {
                     }
                 </td> 
                 <td className="col-sm-2">{ isValid(this.props.product.color)? this.props.product.color.map((color)=>(
-                        <div className="btn btn-outline-primary" >{color.color}</div>
+                        <div key={color.color} className="btn btn-outline-primary" >{color.color}</div>
                     )): "N/A" 
                     }   
                 </td> 
                 <td className="col-sm-2">{this.props.product.notes}  </td> 
-                <td className="col-sm-2">{ isValid(this.props.product.tag)? this.props.product.tag.map((tag)=>{
-                        return tag===null? "" : <div className="btn btn-outline-primary" >{tag}</div>
+                <td className="col-sm-2">{ isValid(this.props.product.tag)? this.props.product.tag.filter((tag)=>tag!==null).map((tag)=>{
+                        return <div key={tag} className="btn btn-outline-primary" >{tag}</div>
                     }): "N/A" 
                     }   
                 </td> 
@@ -411,7 +411,6 @@ export class ProductInfo extends Component {
                     ))
                     }
                     <Button onClick={this.addNewColorModel}> New Color </Button>
-                    {/* <ColorUrlForm addColor={this.addColor} > </ColorUrlForm> */}
                     </Modal.Body>
                     <Modal.Footer>
                     <Button onClick={() => this.toggleColorModalShow(false)} >Close</Button>
@@ -454,8 +453,8 @@ export class ProductInfo extends Component {
                     </Dropdown>
                 </td>
 
-                <td className="col-sm-2">{ isValid(this.state.colorModel)? this.state.colorModel.map((color)=>{
-                        return color===null? "" : <div className="btn btn-outline-primary" >{color.color}</div>
+                <td className="col-sm-2">{ isValid(this.state.colorModel)? this.state.colorModel.filter((color)=>color!==null).map((color)=>{
+                        return  <div key={color.id} className="btn btn-outline-primary" >{color.color}</div>
                     }): "N/A" 
                     }   
                     

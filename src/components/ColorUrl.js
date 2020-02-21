@@ -11,7 +11,6 @@ export class ColorUrl extends Component {
     }
 
     toggleConfirmDelete = (confrimDelete) => {
-        console.log("here")
         this.setState({
             ...this.state,
             confirmDelete: confrimDelete
@@ -21,7 +20,7 @@ export class ColorUrl extends Component {
 
     render() {
         return (
-            <div className="row">
+            <div className="row" key={this.props.color.id}>
                 <img className="col-sm-3"  src={this.props.color.url} alt="not found"></img> 
                 <div className=" col-sm-3 input-group">
                     <div className="custom-file">
