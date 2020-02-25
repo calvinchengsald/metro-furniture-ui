@@ -47,6 +47,7 @@ export class Information extends Component {
     render() {
 
         const relevantProduct = this.props.products.filter((product)=> product.base_code===this.props.informationObject.base_code);
+        const focusedProduct = relevantProduct[0];
         return (
             <React.Fragment>
                 {(!isValid(relevantProduct) || relevantProduct.length===0 ) ? 
@@ -56,7 +57,9 @@ export class Information extends Component {
                 : 
                 <div className="container">
                     <div className="Row">
-                        
+                        <div className="col-sm-6"></div>
+
+                            <img className="col-sm-6" src={focusedProduct.color[0].url} alt="Not found :("></img>
                     </div>
 
                 </div>

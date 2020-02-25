@@ -84,6 +84,46 @@ export class Search extends Component {
 
 
     render() {
+
+        var unfilteredProducts = this.filterProducts();
+
+        const allProductsFragment = (!isValid(unfilteredProducts) || unfilteredProducts.length===0)? 
+            <div className="card border-success mb-3 col-sm-6 col-md-4 col-lg-3" >
+                <img src="https://metro-furniture-resource-stash.s3.amazonaws.com/misc/NoResult.png" className="card-img-top" alt="..."/>
+                <div  className="card-body">
+                    <div className="row card-title"> 
+                        <h5 className="col-sm-12 text-center">No Result :(</h5>
+                    </div>
+                </div>
+            </div>
+        :        
+        unfilteredProducts.map((product)=>(
+            <Link name={product.base_code} key={product.base_code} to="/information" onClick={(e) => this.followToInformation(e)} className="card border-success mb-3 col-sm-6 col-md-4 col-lg-3" >
+                <img name={product.base_code} src={product.color[0].url} className="card-img-top" alt="..."/>
+                <div name={product.base_code} className="card-body">
+                    <div name={product.base_code} className="row card-title"> 
+                        <h5 name={product.base_code} className="col-sm-12 text-center">{product.base_code}</h5>
+                    </div>
+                    <div name={product.base_code} className="row"> 
+                        <div name={product.base_code} className="col-sm-6">Type:</div>
+                        <div name={product.base_code} className="col-sm-6">{product.m_type}</div>
+                    </div>
+                    <div name={product.base_code} className="row"> 
+                        <div name={product.base_code} className="col-sm-6">Subtype:</div>
+                        <div name={product.base_code} className="col-sm-6">{product.m_subtype}</div>
+                    </div>
+                    <hr></hr>
+                    <div name={product.base_code} className="row"> 
+                        {product.tag.map((tag)=> 
+                            <div name={product.base_code} key={tag+"_holder"} className="btn btn-outline-primary"> {tag}</div>
+                        )}
+                    </div>
+
+                </div>
+            </Link>
+        ))
+
+
         return (
             <React.Fragment>
 
@@ -142,31 +182,7 @@ export class Search extends Component {
                     </div>
                 </div>
                 <div className="row">
-                    {this.filterProducts().map((product)=>(
-                        <Link name={product.base_code} key={product.base_code} to="/information" onClick={(e) => this.followToInformation(e)} className="card border-success mb-3 col-sm-6 col-md-4 col-lg-3" >
-                            <img name={product.base_code} src={product.color[0].url} className="card-img-top" alt="..."/>
-                            <div name={product.base_code} className="card-body">
-                                <div name={product.base_code} className="row card-title"> 
-                                    <h5 name={product.base_code} className="col-sm-12 text-center">{product.base_code}</h5>
-                                </div>
-                                <div name={product.base_code} className="row"> 
-                                    <div name={product.base_code} className="col-sm-6">Type:</div>
-                                    <div name={product.base_code} className="col-sm-6">{product.m_type}</div>
-                                </div>
-                                <div name={product.base_code} className="row"> 
-                                    <div name={product.base_code} className="col-sm-6">Subtype:</div>
-                                    <div name={product.base_code} className="col-sm-6">{product.m_subtype}</div>
-                                </div>
-                                <hr></hr>
-                                <div name={product.base_code} className="row"> 
-                                    {product.tag.map((tag)=> 
-                                        <div name={product.base_code} key={tag+"_holder"} className="btn btn-outline-primary"> {tag}</div>
-                                    )}
-                                </div>
-
-                            </div>
-                        </Link>
-                    ))}
+                    {allProductsFragment}
                 </div>
             </React.Fragment>
         )

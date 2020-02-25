@@ -28,7 +28,7 @@ export class ProductPicker extends Component {
     followToSearch = (e) => {
         var filterObject = {
             filterBaseCode: "",
-            filterType: "",
+            filterType: this.state.currentType,
             filterSubtype: e.target.name,
             filterTag: "",
         }
