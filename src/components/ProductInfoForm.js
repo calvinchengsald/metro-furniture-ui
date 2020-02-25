@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import {connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { postProduct  } from '../actions/productActions';
-import { isValidString, removeFromArray, isValid, distinctOnObjectArrayByKey } from '../utils/standardization';
+import { isValidString, removeFromArray, isValid, distinctOnObjectArrayByKey , getSubtypeFromTypeString} from '../utils/standardization';
 import { deletePostS3 } from '../actions/s3Actions';
 import { sortObjectArrayByKey } from '../utils/sort';
 import { Modal , Button} from 'react-bootstrap';
 import ColorUrl from './ColorUrl';
 import {  throwMessageAction } from '../actions/messageActions';
+import {Dropdown } from 'react-bootstrap';
 
 
 export class ProductInfoForm extends Component {
@@ -18,7 +19,8 @@ export class ProductInfoForm extends Component {
         this.state = { 
             base_code: "",
             colorModel: [],
-            colorCounter: 0
+            colorCounter: 0,
+            tagString: "",
     
         }
     }
@@ -46,7 +48,8 @@ export class ProductInfoForm extends Component {
         const tagArr = removeFromArray(e.target.value.split(','),"");
         this.setState({
             ...this.state,
-            tag: tagArr
+            tag: tagArr,
+            tagString: e.target.value
         });
     }
 
@@ -72,17 +75,19 @@ export class ProductInfoForm extends Component {
         this.props.postProduct(product, (success) => {
             document.getElementById("input_base_code").value="";
             document.getElementById("input_m_size").value="";
-            document.getElementById("input_m_type").value="";
-            document.getElementById("input_m_subtype").value="";
+            // document.getElementById("input_m_type").value="";
+            // document.getElementById("input_m_subtype").value="";
             // document.getElementById("input_color").value="";
             document.getElementById("input_notes").value="";
-            document.getElementById("input_tag").value=[];
+            document.getElementById("input_tag").value="";
             this.setState({
                 item_code: "",
                 base_code: "",
                 m_size:    "",
                 colorModel: [],
                 colorCounter : 0,
+                tagString: "",
+                tag: []
             })
         });
     }
@@ -149,13 +154,89 @@ export class ProductInfoForm extends Component {
         })
     }
     
+    colorModelToString = () => {
+        var colorModelString = JSON.stringify(this.state.colorModel);
+        const el = document.createElement('textarea');
+        el.value = colorModelString;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        // this.stringToColorModel();
+    }
+    stringToColorModel = () => {
+
+        navigator.clipboard.readText().then(text => {
+            
+            try{
+                var obj = JSON.parse(text);
+                this.setState({
+                    ...this.state,
+                    colorModel : obj,
+                    colorCounter: obj.length
+                })
+            }
+            catch (e) {
+                this.props.throwMessageAction("Error", "Invalid paste, please copy a valid color");
+            }
+        })
+            
+        
+    }
+    
+    changeFieldFromDropdown = (field, value) => {
+        // if field changed, need to reset subtype as well
+        if(field === "m_type"){
+            this.setState({
+                ...this.state,
+                [field]: value,
+                m_subtype: ""
+            })
+        }
+        else {
+            this.setState({
+                ...this.state,
+                [field]: value
+            })
+
+        }
+    }
+    
+    tagToString = () => {
+        const el = document.createElement('textarea');
+        el.value = this.state.tagString;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    }
+    stringToTag = () => {
+        
+        navigator.clipboard.readText().then(text => {
+            
+            try{
+                const tagArr = removeFromArray(text.split(','),"");
+                this.setState({
+                    ...this.state,
+                    tag: tagArr,
+                    tagString: text
+                });
+            }
+            catch (e) {
+                this.props.throwMessageAction("Error", "Invalid paste, please copy a valid tag CSV");
+            }
+        })
+            
+    }
+    
+
     
     render() {
         
         const colorModalFragment = 
             <React.Fragment>
                 <Button variant="primary" onClick={() => this.toggleColorModalShow(true)}>
-                        Edit Colors
+                        Edit
                 </Button>
                 <Modal
                     size="lg"
@@ -186,18 +267,52 @@ export class ProductInfoForm extends Component {
                 <td className="col-sm-1"> <div className='input form-control' name="item_code">{this.state.item_code}</div></td>
                 <td className="col-sm-1"> <input className='form-control' type="text" name="base_code" id="input_base_code" onChange={this.onChange} placeholder="base code"></input></td>
                 <td className="col-sm-1"> <input className='form-control' type="text" name="m_size"    id="input_m_size"    onChange={this.onChange} placeholder="size"></input></td>
-                <td className="col-sm-1"> <input className='form-control' type="text" name="m_type"    id="input_m_type"    onChange={this.onChange} placeholder="type"></input></td>
+                {/* <td className="col-sm-1"> <input className='form-control' type="text" name="m_type"    id="input_m_type"    onChange={this.onChange} placeholder="type"></input></td>
                 <td className="col-sm-1"> <input className='form-control' type="text" name="m_subtype" id="input_m_subtype" onChange={this.onChange} placeholder="subtype"></input></td>
-                
+                 */}
+                <td className='col-sm-1' >
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            {this.state.m_type}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                        {this.props.allTypes.map((type) => (
+                            <Dropdown.Item className={this.state.m_type===type.m_type?"bg-primary":""} key={type.m_type} name="m_type"  onClick={()=>this.changeFieldFromDropdown( "m_type",type.m_type)}>{type.m_type}</Dropdown.Item>
+                        ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </td>
+                <td className='col-sm-1' >
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            {this.state.m_subtype}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                        { getSubtypeFromTypeString(this.state.m_type, this.props.allTypes, this.props.allSubtypes).map((subtype) => (
+                            <Dropdown.Item className={this.state.subtype===subtype.m_subtype?"bg-primary":""} key={subtype.m_subtype} name="m_subtype"  onClick={()=>this.changeFieldFromDropdown( "m_subtype",subtype.m_subtype)}>{subtype.m_subtype}</Dropdown.Item>
+                        ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </td>
+
                 <td className="col-sm-2">{ isValid(this.state.colorModel)? this.state.colorModel.map((color)=>{
                         return color===null? "" : <div key={color.id} className="btn btn-outline-primary" >{color.color}</div>
                     }): "N/A" 
                     }   
                     
+                    <hr></hr>
+                    <Button onClick={this.colorModelToString}>Copy</Button>   
+                    <Button onClick={this.stringToColorModel}>Paste</Button>
                     {colorModalFragment}  
                 </td> 
                 <td className="col-sm-2"> <input className='form-control' type="text" name="notes"     id="input_notes"     onChange={this.onChange} placeholder="notes"></input></td>
-                <td className="col-sm-2"> <input className='form-control' type="text" name="tag"       id="input_tag"       onChange={this.onChangeTag} placeholder="tag"></input></td>
+                <td className="col-sm-2"> 
+                    <input className='form-control' type="text" name="tag"       id="input_tag"   value={this.state.tagString}    onChange={this.onChangeTag} placeholder="tag"></input>
+                    
+                    <hr></hr>
+                    <Button onClick={this.tagToString}>Copy</Button>   
+                    <Button onClick={this.stringToTag}>Paste</Button>
+                </td>
 
                 <td> <button  onClick={this.onSubmit}  > Create </button></td>
             </tr>
@@ -210,6 +325,8 @@ ProductInfoForm.propTypes = {
     postProduct: PropTypes.func.isRequired,
     deletePostS3: PropTypes.func.isRequired,
     throwMessageAction: PropTypes.func.isRequired,
+    allSubtypes: PropTypes.array.isRequired,
+    allTypes: PropTypes.array.isRequired,
 }
 
 const mapStateToProps = state => ({

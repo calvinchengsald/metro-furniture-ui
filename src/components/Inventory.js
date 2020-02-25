@@ -32,12 +32,6 @@ class Inventory extends Component {
             }
         }
     }
-    componentDidMount() {
-       this.props.fetchProducts();
-       this.props.fetchTypes();
-       this.props.fetchSubtypes();
-    }
-
     toggleTypeEditMode = (editMode) => {
         // if(bool){
         //     this.setState({
@@ -85,14 +79,14 @@ class Inventory extends Component {
     }
     filterProducts = () => {
         var products = this.props.products;
-        products = isValidString(this.state.filter.item_code)? products.filter((data)=> isValid(data.item_code) &&  data.item_code.includes(this.state.filter.item_code) ) : products;
-        products = isValidString(this.state.filter.base_code)? products.filter((data)=> isValid(data.base_code) &&  data.base_code.includes(this.state.filter.base_code) ) : products;
-        products = isValidString(this.state.filter.m_size)? products.filter((data)=> isValid(data.m_size) &&  data.m_size.includes(this.state.filter.m_size) ) : products;
-        products = isValidString(this.state.filter.m_type)? products.filter((data)=> isValid(data.m_type) &&  data.m_type.includes(this.state.filter.m_type) ) : products;
-        products = isValidString(this.state.filter.m_subtype)? products.filter((data)=> isValid(data.m_subtype) &&  data.m_subtype.includes(this.state.filter.m_subtype) ) : products;
-        products = isValidString(this.state.filter.notes)? products.filter((data)=> isValid(data.notes) &&  data.notes.includes(this.state.filter.notes) ) : products;
-        products = isValidString(this.state.filter.tag)? products.filter((data)=> isValid(data.tag) &&  data.tag.filter((tagObj) => tagObj.includes(this.state.filter.tag)).length>0 ) : products;
-        products = isValidString(this.state.filter.color)? products.filter((data)=> isValid(data.color) && data.color.filter((colorObj) => isValid(colorObj) && isValid(colorObj.color) && colorObj.color.includes(this.state.filter.color)).length>0 ) : products;
+        products = isValidString(this.state.filter.item_code)? products.filter((data)=> isValid(data.item_code) && data.item_code.trim().toLowerCase().includes(this.state.filter.item_code.trim().toLowerCase()) ) : products;
+        products = isValidString(this.state.filter.base_code)? products.filter((data)=> isValid(data.base_code) &&  data.base_code.trim().toLowerCase().includes(this.state.filter.base_code.trim().toLowerCase()) ) : products;
+        products = isValidString(this.state.filter.m_size)? products.filter((data)=> isValid(data.m_size) &&  data.m_size.trim().toLowerCase().includes(this.state.filter.m_size.trim().toLowerCase()) ) : products;
+        products = isValidString(this.state.filter.m_type)? products.filter((data)=> isValid(data.m_type) &&  data.m_type.trim().toLowerCase().includes(this.state.filter.m_type.trim().toLowerCase()) ) : products;
+        products = isValidString(this.state.filter.m_subtype)? products.filter((data)=> isValid(data.m_subtype) &&  data.m_subtype.trim().toLowerCase().includes(this.state.filter.m_subtype.trim().toLowerCase()) ) : products;
+        products = isValidString(this.state.filter.notes)? products.filter((data)=> isValid(data.notes) &&  data.notes.trim().toLowerCase().includes(this.state.filter.notes.trim().toLowerCase()) ) : products;
+        products = isValidString(this.state.filter.tag)? products.filter((data)=> isValid(data.tag) &&  data.tag.filter((tagObj) => tagObj.trim().toLowerCase().includes(this.state.filter.tag.trim().toLowerCase())).length>0 ) : products;
+        products = isValidString(this.state.filter.color)? products.filter((data)=> isValid(data.color) && data.color.filter((colorObj) => isValid(colorObj) && isValid(colorObj.color) && colorObj.color.trim().toLowerCase().includes(this.state.filter.color.trim().toLowerCase())).length>0 ) : products;
 
         return products;
     }
@@ -214,7 +208,7 @@ class Inventory extends Component {
                                 <td className="col-sm-1"> <Button className="btn btn-primary" onClick={this.clearFilters} >Clear Filter</Button></td> 
                             </tr>
                             {products}
-                            <ProductInfoForm></ProductInfoForm>
+                            <ProductInfoForm allTypes ={this.props.types} allSubtypes = {this.props.subtypes} ></ProductInfoForm>
                         </tbody>
                     </table>
                 </Route>

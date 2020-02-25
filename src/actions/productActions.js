@@ -57,8 +57,6 @@ export function postProduct(product, successfulCallback) {
     }
     
 }
-
-
 export function updateProduct(product, successfulCallback) {
 
     return function(dispatch) {

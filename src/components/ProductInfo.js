@@ -311,6 +311,63 @@ export class ProductInfo extends Component {
             }
         })
     }
+
+    colorModelToString = () => {
+        var colorModelString = JSON.stringify(this.state.colorModel);
+        const el = document.createElement('textarea');
+        el.value = colorModelString;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        // this.stringToColorModel();
+    }
+    stringToColorModel = () => {
+
+        navigator.clipboard.readText().then(text => {
+            
+            try{
+                var obj = JSON.parse(text);
+                this.setState({
+                    ...this.state,
+                    colorModel : obj,
+                    colorCounter: obj.length
+                })
+            }
+            catch (e) {
+                this.props.throwMessageAction("Error", "Invalid paste, please copy a valid color");
+            }
+        })
+            
+        
+    }
+    
+    tagToString = () => {
+        const el = document.createElement('textarea');
+        el.value = this.state.tagString;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    }
+    stringToTag = () => {
+        
+        navigator.clipboard.readText().then(text => {
+            
+            try{
+                const tagArr = removeFromArray(text.split(','),"");
+                this.setState({
+                    ...this.state,
+                    tag: tagArr,
+                    tagString: text
+                });
+            }
+            catch (e) {
+                this.props.throwMessageAction("Error", "Invalid paste, please copy a valid tag CSV");
+            }
+        })
+            
+    }
     
 
     render() {
@@ -369,13 +426,17 @@ export class ProductInfo extends Component {
                 <td className="col-sm-2">{ isValid(this.props.product.color)? this.props.product.color.map((color)=>(
                         <div key={color.color} className="btn btn-outline-primary" >{color.color}</div>
                     )): "N/A" 
-                    }   
+                    } 
+                    <hr></hr>
+                    <Button onClick={this.colorModelToString}>Copy</Button>   
                 </td> 
                 <td className="col-sm-2">{this.props.product.notes}  </td> 
                 <td className="col-sm-2">{ isValid(this.props.product.tag)? this.props.product.tag.filter((tag)=>tag!==null).map((tag)=>{
                         return <div key={tag} className="btn btn-outline-primary" >{tag}</div>
                     }): "N/A" 
                     }   
+                    <hr></hr>
+                    <Button onClick={this.tagToString}>Copy</Button>   
                 </td> 
                 <td className="col-sm-1"> 
                     <div className="row">
@@ -393,7 +454,7 @@ export class ProductInfo extends Component {
         const colorModalFragment = 
             <React.Fragment>
                 <Button variant="primary" onClick={() => this.toggleColorModalShow(true)}>
-                        Edit Colors
+                        Edit
                 </Button>
                 <Modal
                     size="lg"
@@ -430,10 +491,6 @@ export class ProductInfo extends Component {
                             {this.state.m_type}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                        {/* {this.props.specificSubtypes.map((subtype) => (
-                            <Dropdown.Item key={subtype.m_type} name={type.m_type} onClick={(e)=>this.updateType(e)}>{type.m_type}</Dropdown.Item>
-                        ))} */}
-                        {/* specificSubtypes={getSubtypeFromTypeString(data.m_type, this.props.types, this.props.subtypes)} */}
                         {this.props.allTypes.map((type) => (
                             <Dropdown.Item className={this.state.m_type===type.m_type?"bg-primary":""} key={type.m_type} name="m_type"  onClick={()=>this.changeFieldFromDropdown( "m_type",type.m_type)}>{type.m_type}</Dropdown.Item>
                         ))}
@@ -457,11 +514,18 @@ export class ProductInfo extends Component {
                         return  <div key={color.id} className="btn btn-outline-primary" >{color.color}</div>
                     }): "N/A" 
                     }   
-                    
+                    <hr></hr>
+                    <Button onClick={this.colorModelToString}>Copy</Button>   
+                    <Button onClick={this.stringToColorModel}>Paste</Button>
                     {colorModalFragment}  
                 </td> 
                 <td className='col-sm-2'><input className='form-control'  type="text" name="notes" value={this.state.notes} onChange={this.changeField}></input></td>
-                <td className='col-sm-2'><input className='form-control'  type="text" name="tag" value={this.state.tagString} onChange={this.onChangeTag}></input></td>
+                <td className='col-sm-2'>
+                    <input className='form-control'  type="text" name="tag" value={this.state.tagString} onChange={this.onChangeTag}></input>
+                    <hr></hr>
+                    <Button onClick={this.tagToString}>Copy</Button>   
+                    <Button onClick={this.stringToTag}>Paste</Button>
+                </td>
                 <td className="col-sm-1"> 
                     <div className="row">
                         <button data-toggle="tooltip" data-placement="top" title="Save" onClick={this.triggerUpdateProduct} > Save

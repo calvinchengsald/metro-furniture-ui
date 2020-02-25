@@ -11,9 +11,15 @@ export class Header extends Component {
                 <h1> Metro Furiture Website</h1>
                 <Link style={linkStyle} className='brightLink' to="/">Home</Link>
                 <span>|</span> 
+                <Link  style={linkStyle}  className="brightLink" to='/information'>Information</Link>
+                <span>|</span> 
+                <Link  style={linkStyle}  className="brightLink" to='/search'>Search</Link>
+                <span>|</span> 
                 <Link  style={linkStyle}  className="brightLink" to='/about'>About</Link>
                 <span>|</span> 
                 <Link  style={linkStyle}  className="brightLink" to='/inventory'>Inventory</Link>
+                <span>|</span> 
+                <Link  style={linkStyle}  className="brightLink" to='/external_api'>external_api</Link>
             </header>
         )
     }

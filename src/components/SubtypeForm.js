@@ -48,7 +48,6 @@ export class SubtypeForm extends Component {
             return
         }
         var file = e.target.files[0];
-        console.log(file)
         this.props.deletePostS3(file, "subtypes/", "", (success, url)=> {
             if (success){
                 this.setState({

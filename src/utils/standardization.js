@@ -101,6 +101,23 @@ export function distinctOnObjectArrayByKey(array, key){
 }
 
 
+// returns an array of objects that is distinct by the given key
+export function distinctObjectArrayByKeyFirstOne(array, key){
+
+    var keyHolder = [];
+    var distinctArray = [];
+    for (var i=0; i< array.length; i++){
+        if(array[i] === null || !isValidString(array[i][key])) continue;
+        if(  !keyHolder.includes(array[i][key]) ){
+            keyHolder.push(array[i][key]);
+            distinctArray.push(array[i]);
+        }
+    }
+    return distinctArray;
+}
+
+
+
 // normal includes will not do anything to the existing string.
 // due to bad data, we may need to trim all strings before checking for include comparison
 export function blankStringIncludes(array, object){
@@ -113,6 +130,16 @@ export function blankStringIncludes(array, object){
     }
     catch (error ) {
         return false;
+    }
+}
+
+export function includesStringCaseInsensitive(array, obj){
+    for( var i = 0; i < array.length; i++){
+        // console.log(array[i].trim() + "/" + object.trim() + "=" + (array[i].trim() === object.trim() ))
+        if ( !isValidString(array[i])){
+            continue;
+        }
+        if (array[i].trim().toLowerCase() === obj.trim().toLowerCase() ) return true;
     }
 }
 
@@ -157,6 +184,9 @@ export function getSubtypeFromType(targetTypeObject, allSubtypes) {
 }
 //if you only have the type string, havent done any filtering yet
 export function getSubtypeFromTypeString(targetTypeString, allTypes, allSubtypes) {
+    if (!isValid(targetTypeString)) {
+        return [];
+    }
     var targetTypeArr = allTypes.filter((type) => type.m_type===targetTypeString.trim());
     if( !isValid(targetTypeArr[0])) {
         return [];
