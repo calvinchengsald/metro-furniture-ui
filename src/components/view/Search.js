@@ -74,9 +74,9 @@ export class Search extends Component {
     }
 
     
-    followToInformation = (e) => {
+    followToInformation = (base_cd) => {
         var informationObject = {   
-            base_code: e.target.name
+            base_code: base_cd
         }
         this.props.changeInformation(informationObject);
 
@@ -98,8 +98,8 @@ export class Search extends Component {
             </div>
         :        
         unfilteredProducts.map((product)=>(
-            <Link name={product.base_code} key={product.base_code} to="/information" onClick={(e) => this.followToInformation(e)} className="card border-success mb-3 col-sm-6 col-md-4 col-lg-3" >
-                <img name={product.base_code} src={product.color[0].url} className="card-img-top" alt="..."/>
+            <Link name={product.base_code} key={product.base_code} to="/information" onClick={(e) => this.followToInformation(product.base_code)} className="card border-success mb-3 col-sm-6 col-md-4 col-lg-3" >
+                <img name={product.base_code} src={(isValid(product.color)&&isValid(product.color[0])&&isValidString(product.color[0].url))?product.color[0].url:""} className="card-img-top" alt="..."/>
                 <div name={product.base_code} className="card-body">
                     <div name={product.base_code} className="row card-title"> 
                         <h5 name={product.base_code} className="col-sm-12 text-center">{product.base_code}</h5>
@@ -115,7 +115,8 @@ export class Search extends Component {
                     <hr></hr>
                     <div name={product.base_code} className="row"> 
                         {product.tag.map((tag)=> 
-                            <div name={product.base_code} key={tag+"_holder"} className="btn btn-outline-primary"> {tag}</div>
+                            // <span name={product.base_code} key={tag+"_holder"} className="btn btn-outline-primary mr-sm-2"> {tag}</span>
+                            <span name={product.base_code} key={tag+"_holder"} className="badge badge-pill badge-primary mr-sm-2"> {tag}</span>
                         )}
                     </div>
 
