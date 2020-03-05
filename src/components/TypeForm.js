@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
-import { coalesceString, objectStandardizer, isValid} from '../utils/standardization';
+import { coalesceString, objectStandardizer, callApiWithToken, isValid} from '../utils/standardization';
 import { modelAttributeMapping } from '../models/models';
 import { postTypes } from '../actions/typeActions';
 import { deletePostS3 } from '../actions/s3Actions';
 import {connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import {  throwMessageAction } from '../actions/messageActions';
+
 
 export class TypeForm extends Component {
 
@@ -41,11 +43,13 @@ export class TypeForm extends Component {
             m_subtype: this.state.m_subtype
         }
         newType = objectStandardizer(newType,modelAttributeMapping.TYPE_MODEL );
-        this.props.postTypes(newType, (success)=>{
-            if(success) {
-                this.exitEdit();
-            }
-        });
+        callApiWithToken(this, (config)=>{
+            this.props.postTypes(newType, config, (success)=>{
+                if(success) {
+                    this.exitEdit();
+                }
+            });
+        } , this.props.throwMessageAction)
     }
         
     exitEdit = () =>{
@@ -57,15 +61,17 @@ export class TypeForm extends Component {
             return
         }
         var file = e.target.files[0];
-        this.props.deletePostS3(file, "types/", "", (success, url)=> {
-            if (success){
-                this.setState({
-                    ...this.state,
-                    m_url : url
-                })
+        callApiWithToken(this, (config)=>{
+            this.props.deletePostS3(file, "types/", "", config,(success, url)=> {
+                if (success){
+                    this.setState({
+                        ...this.state,
+                        m_url : url
+                    })
 
-            }
-        })
+                }
+            })
+        } , this.props.throwMessageAction)
     }
 
     render() {
@@ -121,4 +127,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default connect(mapStateToProps, {postTypes, deletePostS3 })(TypeForm);
+export default connect(mapStateToProps, {postTypes, deletePostS3 ,throwMessageAction})(TypeForm);

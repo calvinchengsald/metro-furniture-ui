@@ -3,7 +3,7 @@ import {connect} from 'react-redux' ;
 import { fetchProducts} from '../../actions/productActions';
 import { fetchTypes, fetchSubtypes} from '../../actions/typeActions';
 import PropTypes from 'prop-types';
-import {distinctObjectArrayByKeyFirstOne,isValidString,isValid, getSubtypeFromTypeString,getObjectFromArrayByKey } from '../../utils/standardization';
+import {distinctObjectArrayByKeyFirstOne,isValidString,isValid, getObjectFromArrayByKey } from '../../utils/standardization';
 import { changeSearch } from '../../actions/searchActions';
 import { changeInformation } from '../../actions/productActions';
 import {Dropdown } from 'react-bootstrap';
@@ -137,7 +137,7 @@ export class Information extends Component {
                                 <h5 className="col-md-6 col-lg-8 text-left border">{this.state.focusedProduct.m_subtype}</h5> 
                             </div>
                             <div className="row">
-                                <h5 className="col-md-6 col-lg-4 text-left border">Notes: {this.state.focusedProduct.notes}</h5> 
+                                <h5 className="col-md-6 col-lg-4 text-left border">Notes:</h5> 
                                 <h5 className="col-md-6 col-lg-8 text-left border">{this.state.focusedProduct.notes}</h5> 
                             </div>
                             <div className="row">

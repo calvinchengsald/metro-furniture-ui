@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import {connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { postProduct  } from '../actions/productActions';
-import { isValidString, removeFromArray, isValid, distinctOnObjectArrayByKey , getSubtypeFromTypeString} from '../utils/standardization';
+import { isValidString, removeFromArray, isValid, distinctOnObjectArrayByKey ,callApiWithToken, getSubtypeFromTypeString} from '../utils/standardization';
 import { deletePostS3 } from '../actions/s3Actions';
 import { sortObjectArrayByKey } from '../utils/sort';
 import { Modal , Button} from 'react-bootstrap';
@@ -72,23 +72,25 @@ export class ProductInfoForm extends Component {
             color: convertedColorModel
 
         }
-        this.props.postProduct(product, (success) => {
-            document.getElementById("input_base_code").value="";
-            document.getElementById("input_m_size").value="";
-            // document.getElementById("input_m_type").value="";
-            // document.getElementById("input_m_subtype").value="";
-            // document.getElementById("input_color").value="";
-            document.getElementById("input_notes").value="";
-            document.getElementById("input_tag").value="";
-            this.setState({
-                item_code: "",
-                base_code: "",
-                m_size:    "",
-                colorModel: [],
-                colorCounter : 0,
-                tagString: "",
-                tag: []
-            })
+        callApiWithToken(this, (config)=>{
+            this.props.postProduct(product, config, (success) => {
+                document.getElementById("input_base_code").value="";
+                document.getElementById("input_m_size").value="";
+                // document.getElementById("input_m_type").value="";
+                // document.getElementById("input_m_subtype").value="";
+                // document.getElementById("input_color").value="";
+                document.getElementById("input_notes").value="";
+                document.getElementById("input_tag").value="";
+                this.setState({
+                    item_code: "",
+                    base_code: "",
+                    m_size:    "",
+                    colorModel: [],
+                    colorCounter : 0,
+                    tagString: "",
+                    tag: []
+                })
+            } , this.props.throwMessageAction)
         });
     }
 
@@ -138,13 +140,15 @@ export class ProductInfoForm extends Component {
             return
         }
         var file = e.target.files[0];
-        this.props.deletePostS3(file, this.state.m_type + "/" + this.state.m_subtype +"/", "", (success, url)=> {
-            console.log(url);
-            if (success){
-                this.editColorModel(uuid, "url", url);
+        callApiWithToken(this, (config)=>{
+            this.props.deletePostS3(file, this.state.m_type + "/" + this.state.m_subtype +"/", "", config,(success, url)=> {
+                console.log(url);
+                if (success){
+                    this.editColorModel(uuid, "url", url);
 
-            }
-        })
+                }
+            })
+        } , this.props.throwMessageAction)
     }
     
     toggleColorModalShow = (show) => {

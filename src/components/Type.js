@@ -4,9 +4,10 @@ import SubtypeForm from './SubtypeForm';
 import {connect} from 'react-redux' ;
 import PropTypes from 'prop-types';
 import { updateTypes, deleteSubtypes, postSubtypes, fetchTypes, deleteUpdateTypes, deleteTypes } from '../actions/typeActions';
-import {  removeFromArray, getSubtypeFromType , isValid} from '../utils/standardization';
+import {  removeFromArray, getSubtypeFromType ,callApiWithToken, isValid} from '../utils/standardization';
 import { fetchProducts } from '../actions/productActions';
 import { deletePostS3 } from '../actions/s3Actions';
+import {  throwMessageAction } from '../actions/messageActions';
 export class Type extends Component {
 
     constructor(props) {
@@ -44,7 +45,9 @@ export class Type extends Component {
             ...typeObject,
             m_subtype: newSubtypeArray
         }
-        this.props.updateTypes(typeObject, (success) => { });
+        callApiWithToken(this, (config)=>{
+            this.props.updateTypes(typeObject, config, (success) => { });
+        } , this.props.throwMessageAction)
     }
 
     // post on database with this updated type object
@@ -70,15 +73,17 @@ export class Type extends Component {
                 prePrimaryKey: this.props.type.m_type
             };
             // this component will go away, it no longer exits. refetch type list to get the updated list
-            this.props.deleteUpdateTypes(deleteUpdateModel, (success) => {
-                if(success){
-                    this.props.fetchTypes();
-                    this.props.fetchProducts();
-                } 
-                else {
-    
-                }
-            });
+            callApiWithToken(this, (config)=>{
+                this.props.deleteUpdateTypes(deleteUpdateModel, config, (success) => {
+                    if(success){
+                        this.props.fetchTypes();
+                        this.props.fetchProducts();
+                    } 
+                    else {
+        
+                    }
+                });
+            } , this.props.throwMessageAction)
 
             return;
             
@@ -90,14 +95,16 @@ export class Type extends Component {
             m_url: this.state.m_url,
             m_subtype: this.state.m_subtype
         }
-        this.props.updateTypes(newType, (success) =>{
-            if(success){
-                this.setState({
-                    ...this.state,
-                    editMode: false
-                })
-            }
-        });
+        callApiWithToken(this, (config)=>{
+            this.props.updateTypes(newType, config, (success) =>{
+                if(success){
+                    this.setState({
+                        ...this.state,
+                        editMode: false
+                    })
+                }
+            });
+        } , this.props.throwMessageAction)
     }
     
     deleteSubtypesAndUpdateType = (subtype) => {
@@ -107,9 +114,13 @@ export class Type extends Component {
             m_subtype: removeFromArray(this.props.type.m_subtype, subtype.m_subtype)
         }
         
-        this.props.deleteSubtypes(subtype);
+        callApiWithToken(this, (config)=>{
+            this.props.deleteSubtypes(subtype, config);
+        } , this.props.throwMessageAction)
         
-        this.props.updateTypes(newType, (success) => { });
+        callApiWithToken(this, (config)=>{
+            this.props.updateTypes(newType, config, (success) => { });
+        } , this.props.throwMessageAction)
     }
 
     // new subtype is created, need to update type as well (the subtype array list in type)
@@ -119,16 +130,20 @@ export class Type extends Component {
             ...this.props.type,
             m_subtype: [...this.props.type.m_subtype, subtype.m_subtype]
         }
-        this.props.postSubtypes(subtype, (success) => {
-            if(success) {
-                this.props.updateTypes(newType, (success) => { });
-                successCallbackFunction(true);
-                this.setState({
-                    ...this.state,
-                    addSubtype: false
-                })
-            }
-        });
+        callApiWithToken(this, (config)=>{
+            this.props.postSubtypes(subtype,config, (success) => {
+                if(success) {
+                    callApiWithToken(this, (config)=>{
+                        this.props.updateTypes(newType, config, (success) => { });
+                        successCallbackFunction(true);
+                        this.setState({
+                            ...this.state,
+                            addSubtype: false
+                        })
+                    } , this.props.throwMessageAction)
+                }
+            });
+        } , this.props.throwMessageAction)
     }
 
     toggleAddSubtype = (bool) => {
@@ -182,7 +197,11 @@ export class Type extends Component {
     // when edit, also what about items of this type????????
     actualDelete = () => {
         
-        this.props.deleteTypes(this.props.type);
+        callApiWithToken(this, (config)=>{
+            this.props.deleteTypes(this.props.type,config, (success) => {
+
+            });
+        } , this.props.throwMessageAction)
     }
         
     
@@ -191,22 +210,24 @@ export class Type extends Component {
             return
         }
         var file = e.target.files[0];
-        console.log(file)
-        this.props.deletePostS3(file, "types/", "", (success, url)=> {
-            if (success){
-                this.setState({
-                    ...this.state,
-                    m_url : url
-                })
+        
+        callApiWithToken(this, (config)=>{
+            this.props.deletePostS3(file, "types/", "",config, (success, url)=> {
+                if (success){
+                    this.setState({
+                        ...this.state,
+                        m_url : url
+                    })
 
-            }
-        })
+                }
+            })
+        } , this.props.throwMessageAction)
     }
 
     render() {
 
         const subtypeDisplayElements = getSubtypeFromType(this.props.type, this.props.allSubtypes).map( (sub) => (
-            <Subtypes  key={sub.m_subtype} subtype ={sub} updateType={this.updateType} deleteSubtypesAndUpdateType={this.deleteSubtypesAndUpdateType} ></Subtypes>
+            <Subtypes  key={sub.m_subtype} subtype ={sub} updateType={this.updateType} deleteSubtypesAndUpdateType={this.deleteSubtypesAndUpdateType} getTokenSilently={this.props.getTokenSilently} ></Subtypes>
             
 
         ));
@@ -295,7 +316,7 @@ export class Type extends Component {
 
                     {this.state.addSubtype? 
                         <SubtypeForm toggleAddSubtype={ (bool) => {this.toggleAddSubtype(bool)}}
-                            postSubtypesAndUpdateType={this.postSubtypesAndUpdateType}
+                            postSubtypesAndUpdateType={this.postSubtypesAndUpdateType} getTokenSilently={this.props.getTokenSilently}
                         ></SubtypeForm>
                         : 
                         <button className="btn btn-primary" onClick={ () => {this.toggleAddSubtype(true)}}>Add Subtype</button>
@@ -330,4 +351,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default connect(mapStateToProps, { updateTypes ,fetchProducts, deleteSubtypes,postSubtypes,deleteUpdateTypes, fetchTypes, deleteTypes,deletePostS3})(Type);
+export default connect(mapStateToProps, { updateTypes ,fetchProducts, deleteSubtypes,postSubtypes,deleteUpdateTypes, throwMessageAction,fetchTypes, deleteTypes,deletePostS3})(Type);

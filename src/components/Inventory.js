@@ -13,6 +13,8 @@ import {  Route} from 'react-router-dom';
 import Type from './Type';
 import {blankStringIncludes, isValid, isValidString} from '../utils/standardization';
 import {Button} from 'react-bootstrap';
+import {  throwMessageAction } from '../actions/messageActions';
+
 
 class Inventory extends Component {
 
@@ -46,6 +48,7 @@ class Inventory extends Component {
         });
     }
 
+
     getParentlessSubtypes = () => {
         var parentfulSubtypes = [];
         for (var index in this.props.types) {
@@ -63,6 +66,9 @@ class Inventory extends Component {
     }
 
     clearFilters = () => {
+
+
+
         this.setState({
             ...this.state,
             filter : {
@@ -101,24 +107,26 @@ class Inventory extends Component {
         })
     }
 
+    
+    // callApiWithToken(this, ()=>{console.log("success") } , this.props.throwMessageAction)
     render() {
         
-
         const parentlessSubtypes = this.getParentlessSubtypes().map( sub => (
             
-            <Subtypes  key={sub.m_subtype} subtype ={sub} parentless={true} types={this.props.types}></Subtypes>
+            <Subtypes  key={sub.m_subtype} subtype ={sub} parentless={true} types={this.props.types} getTokenSilently={this.props.getTokenSilently} ></Subtypes>
 
         ));
         const products = insertionSort(this.filterProducts()).map( data => (
             <ProductInfo key={data.item_code} product={data} recentAddItemCode={this.props.recentAddItemCode} removeRecentAdd={this.props.removeRecentAdd} 
-                deleteProduct={this.props.deleteProduct} allTypes ={this.props.types} allSubtypes = {this.props.subtypes}
+                deleteProduct={this.props.deleteProduct} allTypes ={this.props.types} allSubtypes = {this.props.subtypes} getAuthenticationHeader={this.getAuthenticationHeader}
+                getTokenSilently={this.props.getTokenSilently}
             >
             </ProductInfo>
         ));
         
         const types = sortType(this.props.types).map( data => (
             <Type key={data.m_type} type={data} allSubtypes ={this.props.subtypes} recentAddType={this.props.recentAddType} removeRecentType={this.props.removeRecentType}
-
+                    getTokenSilently={this.props.getTokenSilently}
             >
             </Type>
         ));
@@ -168,7 +176,7 @@ class Inventory extends Component {
                             </tr>
                             <tr className="row">
                                 {this.state.typeEditMode? 
-                                <TypeForm toggleTypeEditMode={(bool)=>{this.toggleTypeEditMode(bool)}}></TypeForm> 
+                                <TypeForm toggleTypeEditMode={(bool)=>{this.toggleTypeEditMode(bool)}} getTokenSilently={this.props.getTokenSilently} ></TypeForm> 
                                 :
                                 <td>
                                     <button className="btn btn-primary" onClick={()=>{this.toggleTypeEditMode(true)}} >Add Type</button>
@@ -208,7 +216,7 @@ class Inventory extends Component {
                                 <td className="col-sm-1"> <Button className="btn btn-primary" onClick={this.clearFilters} >Clear Filter</Button></td> 
                             </tr>
                             {products}
-                            <ProductInfoForm allTypes ={this.props.types} allSubtypes = {this.props.subtypes} ></ProductInfoForm>
+                            <ProductInfoForm allTypes ={this.props.types} allSubtypes = {this.props.subtypes} getTokenSilently={this.props.getTokenSilently} ></ProductInfoForm>
                         </tbody>
                     </table>
                 </Route>
@@ -244,4 +252,4 @@ const mapStateToProps = state => ({
     subtypes: sortSubtype(state.typeReducer.subtypes)
 });
 
-export default connect(mapStateToProps, {fetchProducts,removeRecentAdd,deleteProduct, fetchTypes,fetchSubtypes,removeRecentType })(Inventory);
+export default connect(mapStateToProps, {fetchProducts,removeRecentAdd,deleteProduct, fetchTypes,fetchSubtypes,removeRecentType , throwMessageAction})(Inventory);

@@ -3,9 +3,10 @@ import {connect} from 'react-redux' ;
 import {  updateSubtypes , deleteSubtypes, fetchSubtypes, deleteUpdateSubtypes ,updateTypes, fetchTypes} from '../actions/typeActions';
 import { fetchProducts } from '../actions/productActions';
 import PropTypes from 'prop-types';
-import { isValid } from '../utils/standardization';
+import { isValid , callApiWithToken} from '../utils/standardization';
 import {Dropdown } from 'react-bootstrap';
 import { deletePostS3 } from '../actions/s3Actions';
+import {  throwMessageAction } from '../actions/messageActions';
 
 export class Subtypes extends Component {
 
@@ -72,17 +73,19 @@ export class Subtypes extends Component {
             //since this exact subtype has changed, there will be a reload of subtypes.
             // this component will go away, it no longer exits. Will need to refetch subtype list
             // similarly the type list needs to be refreshed since it has a linkage to a new subtype, so it needs to be refreshed
-            this.props.deleteUpdateSubtypes(deleteUpdateModel, (success) => {
-                if(success){
-                    // this.props.updateType(this.props.subtype.m_subtype, this.state.m_subtype);
-                    this.props.fetchSubtypes();
-                    this.props.fetchTypes();
-                    this.props.fetchProducts();
-                } 
-                else {
-    
-                }
-            });
+            callApiWithToken(this, (config)=>{
+                this.props.deleteUpdateSubtypes(deleteUpdateModel, config, (success) => {
+                    if(success){
+                        // this.props.updateType(this.props.subtype.m_subtype, this.state.m_subtype);
+                        this.props.fetchSubtypes();
+                        this.props.fetchTypes();
+                        this.props.fetchProducts();
+                    } 
+                    else {
+        
+                    }
+                });
+            } , this.props.throwMessageAction)
             return;
             
         }
@@ -93,18 +96,20 @@ export class Subtypes extends Component {
                 m_url: this.state.m_url,
                 m_description: this.state.m_description
             };
-            this.props.updateSubtypes(updatedSubtype, (success) => {
-                if(success){
-                    this.setState({
-                        ...this.state,
-                        currentEdit: false,
-                        prevState: {}
-                    })
-                } 
-                else {
-    
-                }
-            });
+            callApiWithToken(this, (config)=>{
+                this.props.updateSubtypes(updatedSubtype, config, (success) => {
+                    if(success){
+                        this.setState({
+                            ...this.state,
+                            currentEdit: false,
+                            prevState: {}
+                        })
+                    } 
+                    else {
+        
+                    }
+                });
+            } , this.props.throwMessageAction)
         }
         
     }
@@ -120,7 +125,9 @@ export class Subtypes extends Component {
         updateType?
         this.props.deleteSubtypesAndUpdateType(this.props.subtype)
         :
-        this.props.deleteSubtypes(this.props.subtype)
+        callApiWithToken(this, (config)=>{
+            this.props.deleteSubtypes(this.props.subtype, config)
+        } , this.props.throwMessageAction)
     }
 
     cancelDelete = () => {
@@ -144,14 +151,16 @@ export class Subtypes extends Component {
                 ...typeObject[0],
                 m_subtype: [...typeObject[0].m_subtype, this.state.m_subtype.trim()]
             }
-            this.props.updateTypes(newTypeObject, (success) => {
-                if(success){
-                    this.setState({
-                        ...this.state,
-                        parentless: false
-                    })
-                }
-             });
+            callApiWithToken(this, (config)=>{
+                this.props.updateTypes(newTypeObject,config,  (success) => {
+                    if(success){
+                        this.setState({
+                            ...this.state,
+                            parentless: false
+                        })
+                    }
+                });
+            } , this.props.throwMessageAction)
         } 
         catch (error) {
             console.log("invalid type assignment. this should be impossible through the UI");
@@ -167,15 +176,17 @@ export class Subtypes extends Component {
         }
         var file = e.target.files[0];
         console.log(file)
-        this.props.deletePostS3(file, "subtypes/", "", (success, url)=> {
-            if (success){
-                this.setState({
-                    ...this.state,
-                    m_url : url
-                })
+        callApiWithToken(this, (config)=>{
+            this.props.deletePostS3(file, "subtypes/", "", config,(success, url)=> {
+                if (success){
+                    this.setState({
+                        ...this.state,
+                        m_url : url
+                    })
 
-            }
-        })
+                }
+            })
+        } , this.props.throwMessageAction)
     }
 
 
@@ -307,4 +318,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default connect(mapStateToProps, {updateSubtypes,fetchSubtypes,deleteUpdateSubtypes, deleteSubtypes,updateTypes,fetchTypes,fetchProducts, deletePostS3 })(Subtypes);
+export default connect(mapStateToProps, {updateSubtypes,fetchSubtypes,deleteUpdateSubtypes,throwMessageAction,deleteSubtypes,updateTypes,fetchTypes,fetchProducts, deletePostS3 })(Subtypes);

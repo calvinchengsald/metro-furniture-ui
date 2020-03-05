@@ -30,13 +30,14 @@ export function fetchTypes() {
 }
 
 
-export function postTypes(type,callbackSuccessfulUpdate) {
+export function postTypes(type,config,callbackSuccessfulUpdate) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
          
+        console.log("just this cors");
          type = objectStandardizer(type, modelAttributeMapping.TYPE_MODEL );
-         axios.post( basePath +'/typehiearchy', type)
+         axios.post( basePath +'/typehiearchy', type,config)
          .then(res => {
             callbackSuccessfulUpdate(true);
             var newType  = objectStandardizer(res.data.content, modelAttributeMapping.TYPE_MODEL );
@@ -47,6 +48,7 @@ export function postTypes(type,callbackSuccessfulUpdate) {
             
          })
          .catch( error => {
+             console.log(error);
             callbackSuccessfulUpdate(false);
             dispatch({
                 type: actionTypes.MESSAGE_CHANGE,
@@ -58,12 +60,12 @@ export function postTypes(type,callbackSuccessfulUpdate) {
 }
 
 
-export function updateTypes(type, callbackSuccessfulUpdate) {
+export function updateTypes(type,config, callbackSuccessfulUpdate) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
          type = objectStandardizer(type, modelAttributeMapping.TYPE_MODEL );
-         axios.post( basePath +'/typehiearchy/update', type)
+         axios.post( basePath +'/typehiearchy/update', type,config)
          .then(res => {
             callbackSuccessfulUpdate(true);
             res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.TYPE_MODEL );
@@ -83,11 +85,11 @@ export function updateTypes(type, callbackSuccessfulUpdate) {
     
 }
 
-export function deleteUpdateTypes(deleteUpdateModel,callbackSuccessfulUpdate) {
+export function deleteUpdateTypes(deleteUpdateModel,config,callbackSuccessfulUpdate) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
-         axios.post( basePath +'/typehiearchy/deleteupdate', deleteUpdateModel)
+         axios.post( basePath +'/typehiearchy/deleteupdate', deleteUpdateModel,config)
          .then(res => {
              // need a full refetch of this list
              // can be optimized here, but that means the return data will have to change so we
@@ -108,11 +110,11 @@ export function deleteUpdateTypes(deleteUpdateModel,callbackSuccessfulUpdate) {
 
 
 
-export function deleteTypes(type, callbackSuccessfulUpdate) {
+export function deleteTypes(type,config, callbackSuccessfulUpdate) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
-         axios.post( basePath +'/typehiearchy/delete', type)
+         axios.post( basePath +'/typehiearchy/delete', type,config)
          .then(res => {
 
             res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.TYPE_MODEL );
@@ -159,12 +161,12 @@ export function fetchSubtypes() {
     
 }
 
-export function postSubtypes(subtype,callbackSuccessfulUpdate) {
+export function postSubtypes(subtype,config,callbackSuccessfulUpdate) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
          subtype = objectStandardizer(subtype, modelAttributeMapping.SUBTYPE_MODEL );
-         axios.post( basePath +'/subtypehiearchy', subtype)
+         axios.post( basePath +'/subtypehiearchy', subtype,config)
          .then(res => {
              
             res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.SUBTYPE_MODEL );
@@ -186,12 +188,12 @@ export function postSubtypes(subtype,callbackSuccessfulUpdate) {
     
 }
 
-export function updateSubtypes(subtype,callbackSuccessfulUpdate) {
+export function updateSubtypes(subtype,config,callbackSuccessfulUpdate) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
          subtype = objectStandardizer(subtype, modelAttributeMapping.SUBTYPE_MODEL );
-         axios.post( basePath +'/subtypehiearchy/update', subtype)
+         axios.post( basePath +'/subtypehiearchy/update', subtype,config)
          .then(res => {
              
             res.data.content = objectStandardizer(res.data.content, modelAttributeMapping.SUBTYPE_MODEL );
@@ -213,11 +215,11 @@ export function updateSubtypes(subtype,callbackSuccessfulUpdate) {
     
 }
 
-export function deleteUpdateSubtypes(deleteUpdateModel,callbackSuccessfulUpdate) {
+export function deleteUpdateSubtypes(deleteUpdateModel,config,callbackSuccessfulUpdate) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
-         axios.post( basePath +'/subtypehiearchy/deleteupdate', deleteUpdateModel)
+         axios.post( basePath +'/subtypehiearchy/deleteupdate', deleteUpdateModel,config)
          .then(res => {
              
             callbackSuccessfulUpdate(true);
@@ -237,11 +239,11 @@ export function deleteUpdateSubtypes(deleteUpdateModel,callbackSuccessfulUpdate)
 
 
 
-export function deleteSubtypes(subtype) {
+export function deleteSubtypes(subtype,config) {
 
     return function(dispatch) {
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
-         axios.post( basePath +'/subtypehiearchy/delete', subtype)
+         axios.post( basePath +'/subtypehiearchy/delete', subtype,config)
          .then(res => {
 
             

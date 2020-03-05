@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { isValid, removeFromArray, isValidString, arrayToCSV,getSubtypeFromTypeString,distinctOnObjectArrayByKey, blankStringIncludesByKey,cloneObjectArray } from '../utils/standardization';
+import { isValid, removeFromArray, isValidString, arrayToCSV,getSubtypeFromTypeString,callApiWithToken ,distinctOnObjectArrayByKey, blankStringIncludesByKey,cloneObjectArray } from '../utils/standardization';
 import {connect} from 'react-redux' ;
 import {  updateProduct, deleteUpdateProducts, fetchProducts} from '../actions/productActions';
 import {deletePostS3 } from '../actions/s3Actions';
@@ -57,7 +57,10 @@ export class ProductInfo extends Component {
     }
 
     delete = () => {
-        this.props.deleteProduct(this.props.product);
+        
+        callApiWithToken(this, (config)=>{
+            this.props.deleteProduct(this.props.product, config);
+        } , this.props.throwMessageAction)
     }
     toggleConfirmDelete = (confrimDel) => {
         this.setState({
@@ -188,12 +191,10 @@ export class ProductInfo extends Component {
     // colorModel can have null objects inside, need to convert to just color object used in the request
     convertColorModelToColor = () => {
         // var modelClone = cloneObjectArray(this.state.colorModel);
-
         return this.state.colorModel.filter((data) => data!==null);
     }
 
     triggerUpdateProduct = () => {
-
        //check color model, error if duplicate on color
        if (!distinctOnObjectArrayByKey(this.state.colorModel, "color") ) {
             this.props.throwMessageAction("Error", "Cannot have duplicate colors for the same item. Please use a different color name");
@@ -231,14 +232,18 @@ export class ProductInfo extends Component {
                 prePrimaryKey: this.props.product.item_code
             };
             // this component will go away, it no longer exits. refetch type list to get the updated list
-            this.props.deleteUpdateProducts(deleteUpdateModel, (success) => {
-                if(success){
-                    this.props.fetchProducts();
-                } 
-                else {
-
-                }
-            });
+            
+            callApiWithToken(this, (config)=>{
+                this.props.deleteUpdateProducts(deleteUpdateModel, config,(success) => {
+                    if(success){
+                        this.props.fetchProducts();
+                    } 
+                    else {
+    
+                    }
+                });
+            } , this.props.throwMessageAction)
+            
 
             return;
             
@@ -256,11 +261,14 @@ export class ProductInfo extends Component {
             notes: this.state.notes,
             tag: this.state.tag
         };
-        this.props.updateProduct(updatedProduct, (success) => {
-            if(success){
-                this.toggleEditMode(false, false);
-            }
-        });
+        
+        callApiWithToken(this, (config)=>{
+            this.props.updateProduct(updatedProduct, config, (success) => {
+                if(success){
+                    this.toggleEditMode(false, false);
+                }
+            });
+        } , this.props.throwMessageAction)
     }
 
     deleteColorModel = (uuid) => {
@@ -303,13 +311,16 @@ export class ProductInfo extends Component {
             return
         }
         var file = e.target.files[0];
-        this.props.deletePostS3(file, this.props.product.m_type + "/" + this.props.product.m_subtype +"/", "", (success, url)=> {
-            console.log(url);
-            if (success){
-                this.editColorModel(uuid, "url", url);
+        
+        callApiWithToken(this, (config)=>{
+            this.props.deletePostS3(file, this.props.product.m_type + "/" + this.props.product.m_subtype +"/", "", config, (success, url)=> {
+                console.log(url);
+                if (success){
+                    this.editColorModel(uuid, "url", url);
 
-            }
-        })
+                }
+            })
+        } , this.props.throwMessageAction)
     }
 
     colorModelToString = () => {

@@ -1,5 +1,6 @@
 
 
+import { useAuth0 } from "../react-auth0-spa";
 export function isValidString (value) {
     return value!==undefined && value!==null && value.trim()!=="";
 }
@@ -216,3 +217,38 @@ export function cloneObjectArray(array) {
 
     return cloneArray;
 }
+
+
+
+
+export const GetAuthenticationHeader = () => {
+    console.log("in here");
+    const {  user, getTokenSilently,getIdTokenClaims } = useAuth0();
+    console.log(getIdTokenClaims().__raw);
+    console.log(getTokenSilently());
+      let config = {
+          headers: {
+            header1: "value",
+          }
+        }
+    return config
+}
+
+
+
+export const callApiWithToken = async (that, callback, errorMessage) => {
+    try {
+        const token = await that.props.getTokenSilently();
+
+        var config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+              }
+        }
+        callback(config);
+        console.log(config)
+    } catch (error) {
+        errorMessage("Authorization Error", "You must be logged in to make that action");
+      console.error(error);
+    }
+  };

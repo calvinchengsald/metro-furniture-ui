@@ -9,15 +9,16 @@ import  MessageBox  from './components/MessageBox';
 import  Search  from './components/view/Search';
 import  Information  from './components/view/Information';
 import { useAuth0 } from "./react-auth0-spa";
-import { NavBar } from './components/layout/NavBar';
+import  NavBar  from './components/layout/NavBar';
 import ExternalApi from './components/view/ExternalApi';
 import ProductPicker from './components/view/ProductPicker';
 import AppInit from './AppInit'
+import { Contact } from './components/layout/Contact';
 
 function App() {
   
   
-  const { loading } = useAuth0();
+  const { loading, getTokenSilently } = useAuth0();
 
       
   const PrivateRoute = ({ component: Component, ...rest }) => {
@@ -32,12 +33,11 @@ function App() {
 
   return (
       
-      
       <Router>
+        <Header>       </Header>
         <div className="App ml-5 mr-5">
           <AppInit></AppInit>
-          <Header>       </Header>
-          {loading? <div>Loading...</div> : <NavBar></NavBar> }
+          <NavBar></NavBar> 
           <Route exact path="/" render={props => (
             <React.Fragment>
               <p>Home page source stuff</p>
@@ -48,8 +48,10 @@ function App() {
           <Route path="/about" component={About} />
           <Route path="/information" component={Information} />
           {/* <PrivateRoute path="/inventory" component={Inventory} /> */}
-          <Route path="/inventory" component={Inventory} />
+          <Route path="/inventory" render={(props) => <Inventory getTokenSilently={()=>getTokenSilently()}></Inventory>} />
+          {/* <Route path="/inventory"  component={Inventory} /> */}
           <PrivateRoute path="/external_api" component={ExternalApi} />
+          <Route path="/contact" component={Contact} />
           <MessageBox></MessageBox>
           <Footer></Footer>
         </div>

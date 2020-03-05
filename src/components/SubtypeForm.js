@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { coalesceString , isValid} from '../utils/standardization';
+import { coalesceString , isValid, callApiWithToken} from '../utils/standardization';
 import { deletePostS3 } from '../actions/s3Actions';
 import {connect } from 'react-redux';
+import {  throwMessageAction } from '../actions/messageActions';
 
 
 export class SubtypeForm extends Component {
@@ -48,15 +49,17 @@ export class SubtypeForm extends Component {
             return
         }
         var file = e.target.files[0];
-        this.props.deletePostS3(file, "subtypes/", "", (success, url)=> {
-            if (success){
-                this.setState({
-                    ...this.state,
-                    m_url : url
-                })
+        callApiWithToken(this, (config)=>{
+            this.props.deletePostS3(file, "subtypes/", "", config,(success, url)=> {
+                if (success){
+                    this.setState({
+                        ...this.state,
+                        m_url : url
+                    })
 
-            }
-        })
+                }
+            })
+        } , this.props.throwMessageAction)
     }
 
 
@@ -115,4 +118,4 @@ const mapStateToProps = state => ({
 
 });
 
-export default connect(mapStateToProps, { deletePostS3 })(SubtypeForm);
+export default connect(mapStateToProps, { deletePostS3,throwMessageAction })(SubtypeForm);

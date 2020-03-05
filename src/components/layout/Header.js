@@ -1,34 +1,40 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
+import { useAuth0 } from "../../react-auth0-spa";
 
-export class Header extends Component {
+export const Header = () => {
+
+    const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
 
-
-    render() {
-        return (
-            <header style={headerStyle}>
-                <h1> Metro Furiture Website</h1>
-                <Link style={linkStyle} className='brightLink' to="/">Home</Link>
-                <span>|</span> 
-                <Link  style={linkStyle}  className="brightLink" to='/information'>Information</Link>
-                <span>|</span> 
-                <Link  style={linkStyle}  className="brightLink" to='/search'>Search</Link>
-                <span>|</span> 
-                <Link  style={linkStyle}  className="brightLink" to='/about'>About</Link>
-                <span>|</span> 
-                <Link  style={linkStyle}  className="brightLink" to='/inventory'>Inventory</Link>
-                <span>|</span> 
-                <Link  style={linkStyle}  className="brightLink" to='/external_api'>external_api</Link>
-            </header>
-        )
-    }
+    return (
+        <header className=" border-bottom border-dark mb-3" style={headerStyle}>
+            <div className="App ml-5 mr-5">
+                <div className="row">
+                    <div className="col-sm-3">
+                        <Link className="btn btn-sm btn-secondary" to='/contact'>Contact</Link>
+                    </div>
+                    <h5 className="col-sm-6 text-center">
+                        <Link style={{ textDecoration: 'none', color: '#000000' }} to='/'>Metro Restaurant Furiture</Link>
+                    </h5>
+                    <div className="col-sm-3 d-flex justify-content-end">
+                        {!isAuthenticated && 
+                          (<Link   className="btn btn-sm btn-secondary mr-2" to='/inventory'>Inventory</Link> )
+                        }
+                        {!isAuthenticated?
+                            <div className="btn btn-sm btn-secondary" onClick={() => loginWithRedirect({})} >Login</div>    
+                            :
+                            <div className="btn btn-sm btn-secondary" onClick={() => logout({})} >Logout</div>    
+                        }
+                    </div>
+                </div>
+            </div>
+        </header>
+    )
 }
 
 const headerStyle= {
-    background: '#333',
-    color: '#FFFF00',
-    textAlign: 'center',
+    background: '#D3D3D3',
     padding: '5px'
 }
 export const linkStyle = {

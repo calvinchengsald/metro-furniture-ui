@@ -1,12 +1,13 @@
 
 import {actionTypes, basePath} from '../actions/types'
 import axios from 'axios';
+import { isValid } from '../utils/standardization';
 
 
 
 
 
-export function deletePostS3(file, path, deletePath, successfulCallback) {
+export function deletePostS3(file, path, deletePath, config2, successfulCallback) {
 
     return function(dispatch) {
         const formData = new FormData();
@@ -15,7 +16,8 @@ export function deletePostS3(file, path, deletePath, successfulCallback) {
         formData.append('deleteFilePath',deletePath);
         const config = {
             headers: {
-                'content-type': 'multipart/form-data'
+                'content-type': 'multipart/form-data',
+                'Authorization': (isValid(config2) && isValid(config2.headers) && isValid(config2.headers.Authorization))?config2.headers.Authorization:"NA"
             }
         }
          // axios.get('http://ec2-34-221-235-186.us-west-2.compute.amazonaws.com:8080/product/all')
