@@ -128,24 +128,24 @@ export class Search extends Component {
         return (
             <React.Fragment>
 
-                <div className="container">
-                    <div className="row">
-                        <h1>Set Filters</h1>
-                    </div>
-                    <div className="row">
-                        <div className="input-group input-group-sm mb-3 col-sm-3">
-                            <div className="input-group-prepend">
-                                <span className="input-group-text" id="base_code">Base Code</span>
+                <div className="container-fluid mt-3 border border-grey bg-light">
+
+                    <div className="row border border-dark ">
+
+                        <div className="col my-3">
+                            <div className="input-group ">
+                                <div className="input-group-prepend">
+                                    <span className="input-group-text" id="base_code">Base Code</span>
+                                </div>
+                                <input type="text" className=" form-control  ml-0 align-items-stretch" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={this.props.filterObject.filterBaseCode} onChange={(e)=>this.setStateVariable("filterBaseCode", e.target.value)}></input>
                             </div>
-                            <input type="text" className="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={this.props.filterObject.filterBaseCode} onChange={(e)=>this.setStateVariable("filterBaseCode", e.target.value)}></input>
                         </div>
-                        <div className="input-group input-group-sm mb-3 col-sm-2">
-                            <div className="input-group-prepend">
-                                <span className="input-group-text" id="m_type">Type</span>
-                            </div>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="success" id="dropdown-basic">
-                                    {this.props.filterObject.filterType}
+                        
+                        <div className="col my-3 mx-2">
+                            <Dropdown className="row">
+                                <span className="input-group-text col-sm-3" >Type</span>
+                                <Dropdown.Toggle variant="success" id="dropdown-basic" className="col-sm-9">
+                                    {this.props.filterObject.filterType===""?"ALL" : this.props.filterObject.filterType }
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                 <Dropdown.Item name="m_type"  onClick={()=>this.changeFieldFromDropdown( "filterType","")}>ALL</Dropdown.Item>
@@ -155,13 +155,12 @@ export class Search extends Component {
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>
-                        <div className="input-group input-group-sm mb-3 col-sm-2">
-                            <div className="input-group-prepend">
-                                <span className="input-group-text" id="m_subtype">Subtype</span>
-                            </div>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="success" id="dropdown-basic">
-                                    {this.props.filterObject.filterSubtype}
+                        
+                        <div className="col my-3 mx-2">
+                            <Dropdown className="row">
+                                <span className="input-group-text col-sm-4" >Subtype</span>
+                                <Dropdown.Toggle variant="success" id="dropdown-basic" className="col-sm-8">
+                                    {this.props.filterObject.filterSubtype==="" ? "ALL" : this.props.filterObject.filterSubtype}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                 <Dropdown.Item name="m_subtype"  onClick={()=>this.changeFieldFromDropdown( "filterSubtype","")}>ALL</Dropdown.Item>
@@ -171,19 +170,25 @@ export class Search extends Component {
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>
-                        <div className="input-group input-group-sm mb-3 col-sm-2">
-                            <div className="input-group-prepend">
-                                <span className="input-group-text" id="tag">Tag</span>
+                        
+                        
+                        <div className="col my-3">
+                            <div className="input-group ">
+                                <div className="input-group-prepend">
+                                    <span className="input-group-text" id="tag">Tag</span>
+                                </div>
+                                <input type="text" className="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={this.props.filterObject.filterTag} onChange={(e)=>this.setStateVariable("filterTag", e.target.value)}></input>
                             </div>
-                            <input type="text" className="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={this.props.filterObject.filterTag} onChange={(e)=>this.setStateVariable("filterTag", e.target.value)}></input>
                         </div>
-                        <div className="col-sm-2">
+                        
+                        <div className="col my-3">
                             <div className="btn btn-primary" onClick={this.clearFilters}>Clear Filters</div>
                         </div>
                     </div>
-                </div>
-                <div className="row">
-                    {allProductsFragment}
+                    
+                    <div className="row">
+                        {allProductsFragment}
+                    </div>
                 </div>
             </React.Fragment>
         )

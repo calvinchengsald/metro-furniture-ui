@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import React, { Component } from 'react'
 import {connect} from 'react-redux' ;
 import PropTypes from 'prop-types';
-import {isValid,getSubtypeFromType } from '../../utils/standardization'
+import {getSubtypeFromType } from '../../utils/standardization'
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import {sortObjectArrayByKey  } from '../../utils/sort'
 import {changeSearch} from '../../actions/searchActions'
@@ -24,18 +24,10 @@ export class NavBar extends Component {
       if( NavBar.getOrderTypeListCSV(state.prevTypes) === NavBar.getOrderTypeListCSV(props.types)) {
           return state;
       }
-      // if( state.prevTypes === props.types) {
-      //   return state;
-      // } 
-      console.log("check update passed");
       var newState = {
         ...state,
         prevTypes : props.types
       }
-      props.types.map((type)=>{
-        newState[(type.m_type+"_isOpen").trim()] = false
-      })
-
       return newState;
   }
   
@@ -69,91 +61,75 @@ export class NavBar extends Component {
   }
 
   render() {
-    return (
-      
-    <div 
-    onMouseEnter = {()=> this.setStateVariable( "_isOpen" , true)}>
-      <Dropdown className="d-flex btn btn-lg btn-info mx-0 p-0 bg-info"
-        
-        isOpen={ this.state._isOpen }
-        toggle={()=> this.setStateVariable( "_isOpen" , !this.state._isOpen)}
-      >
-        <DropdownToggle caret>
-        </DropdownToggle>
+
+    const dropdownTypeFragment = 
+      <DropdownMenu className="col-sm-12 border border-dark bg-light shadow-lg" 
+        onMouseLeave = {()=> this.setStateVariable( "_isOpen" , false)}>
+          <div className="row"> 
+          
+            {getSubtypeFromType(this.state.currentType, this.props.subtypes).map( (subtype)=> (
+                <DropdownItem className="col" key={subtype.m_subtype}>
+                  
+                  <Link  key={subtype.m_subtype} to="/search" name={subtype.m_subtype} onClick={() => this.followToSearch(this.state.currentType.m_type,subtype.m_subtype)}>
+                    <img src={subtype.m_url} alt="Not Found"/>
+                    <div className="text-center"> {subtype.m_subtype}</div>
+                  </Link>
+                </DropdownItem>
+            ))}
+          </div>
+      </DropdownMenu>
+
+    const dropdownTypeOptionFragment = 
+      <React.Fragment>
         {this.props.types.map( (type)=> {
           return (
-          <div key={type.m_type} className=" mx-0 my-0 px-0 py-0 col border border-dark"
-             onMouseEnter =  {()=> this.setStateVariable( "currentType" , type)}
-             onClick={() => this.followToSearch(type.m_type,"")}
+          <Link key={type.m_type} to="/search" className=" mx-0 my-0 px-0 py-0 col border border-dark text-light"
+            onMouseEnter =  {()=> this.setStateVariable( "currentType" , type)}
+            onClick={() => this.followToSearch(type.m_type,"")}
           >
             {type.m_type}
-          </div>
-          )
+          </Link>
+          ) 
         })}
-        <DropdownMenu className="col-sm-12 border border-dark" 
-          onMouseLeave = {()=> this.setStateVariable( "_isOpen" , false)}>
-            <div className="row"> 
-            
-              {getSubtypeFromType(this.state.currentType, this.props.subtypes).map( (subtype)=> (
-                  <DropdownItem className="col" key={subtype.m_subtype}>
-                    
-                    <Link  key={subtype.m_subtype} to="/search" name={subtype.m_subtype} onClick={() => this.followToSearch(this.state.currentType.m_type,subtype.m_subtype)}>
-                      <img src={subtype.m_url} alt="Not Found"/>
-                      <div className="text-center"> {subtype.m_subtype}</div>
-                    </Link>
-                  </DropdownItem>
-              ))}
-            </div>
-        </DropdownMenu>
+      </React.Fragment>
 
-      </Dropdown>
-      
-      
-      {/* {this.props.types.map( (type)=> {
-          return (
-          <div key={type.m_type} className=" mx-0 my-0 px-0 py-0 col">
-              <Dropdown
-                className=" bg-info"
-                onMouseEnter = {()=> this.setStateVariable( (type.m_type+"_isOpen").trim() , true) }
-                onMouseLeave = {()=> this.setStateVariable( (type.m_type+"_isOpen").trim() , false)}
-                isOpen={ isValid(this.state[(type.m_type+"_isOpen").trim()]) &&  this.state[(type.m_type+"_isOpen").trim()] }
-                toggle={ () => this.doNothing() }
-              >
-                <div className="border border-dark">
-                  
-                  <DropdownToggle className=" border-0 bg-info " >
-                    {type.m_type}
-                  </DropdownToggle>
+
+    return (
+      <React.Fragment>
+        <div className="d-flex flex-row my-2 p-2 align-items-end">
+                <Link to="/" className="col-sm-3 col-md-2">
+                  <img class="img-fluid" src="https://metro-furniture-resource-stash.s3.amazonaws.com/misc/logo-shrink.png" alt=".not found..." />
+                </Link>
+                <div className="col-sm-9 col-md-10 my-3">
+                    <div className="input-group ">
+                        <input type="text" className="shadow form-control  ml-0 align-items-stretch" aria-label="Small" aria-describedby="inputGroup-sizing-sm"></input>
+                        <div className="input-group-append">
+                            <span className="btn btn-sm btn-secondary border border-dark" id="base_code">Search</span>
+                            <Link to="/search" className="btn btn-sm btn-secondary border border-dark" id="base_code">Advance</Link>
+                        </div>
+                    </div>
                 </div>
-                <DropdownMenu className="">
-                  {getSubtypeFromType(type, this.props.subtypes).map( (subtype)=> (
-                      
-                    <DropdownItem key={subtype.m_subtype}>{subtype.m_subtype}</DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
+        </div>
+        <div className="" onMouseEnter = {()=> this.setStateVariable( "_isOpen" , true)}>
+          <Dropdown className="d-flex btn btn-lg btn-info mx-0 p-0 bg-info"
+            isOpen={ this.state._isOpen }
+            toggle={()=> this.setStateVariable( "_isOpen" , !this.state._isOpen)}
+          >
+            <DropdownToggle caret>
+            </DropdownToggle>
+            
+            {dropdownTypeOptionFragment}
+            {dropdownTypeFragment}
+          </Dropdown>
+        {/* <Link  style={linkStyle}  className="brightLink" to='/information'>Information</Link> */}
+        </div>
 
-          </div>
-          )
-        })} */}
-    {/* <Link  style={linkStyle}  className="brightLink" to='/information'>Information</Link> */}
+      </React.Fragment>
     
-    
-    </div>
     )
   }
 }
 
-
-const headerStyle= {
-  background: '#333',
-  color: '#FFFF00',
-  textAlign: 'center',
-  padding: '5px'
-}
-const linkStyle = {
-  color: '#FFFF00'
-}
 
 
 NavBar.propTypes = {

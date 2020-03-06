@@ -18,7 +18,7 @@ export const Header = () => {
                         <Link style={{ textDecoration: 'none', color: '#000000' }} to='/'>Metro Restaurant Furiture</Link>
                     </h5>
                     <div className="col-sm-3 d-flex justify-content-end">
-                        {!isAuthenticated && 
+                        {isAuthenticated && 
                           (<Link   className="btn btn-sm btn-secondary mr-2" to='/inventory'>Inventory</Link> )
                         }
                         {!isAuthenticated?

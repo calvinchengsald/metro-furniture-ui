@@ -1,14 +1,11 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux' ;
-import { fetchProducts} from '../../actions/productActions';
-import { fetchTypes, fetchSubtypes} from '../../actions/typeActions';
 import PropTypes from 'prop-types';
-import {distinctObjectArrayByKeyFirstOne,isValidString,isValid, getObjectFromArrayByKey } from '../../utils/standardization';
+import {isValidString,isValid, getObjectFromArrayByKey } from '../../utils/standardization';
 import { changeSearch } from '../../actions/searchActions';
-import { changeInformation } from '../../actions/productActions';
-import {Dropdown } from 'react-bootstrap';
 import {  throwMessageAction } from '../../actions/messageActions';
 import {sortObjectArrayByKey } from '../../utils/sort'
+import {Link} from 'react-router-dom';
 export class Information extends Component {
 
     constructor(props){
@@ -42,24 +39,12 @@ export class Information extends Component {
         
         })
     }
-
-    filterProducts = () => {
-        var products = this.props.products;
-        products = isValidString(this.props.filterObject.filterBaseCode)? products.filter((data)=> isValid(data.base_code) &&  data.base_code.trim().toLowerCase().includes(         this.props.filterObject.filterBaseCode.trim().toLowerCase()) ) : products;
-        products = isValidString(this.props.filterObject.filterType)? products.filter((data)=> isValid(data.m_type) &&  data.m_type.trim().toLowerCase().includes(                   this.props.filterObject.filterType.trim().toLowerCase()) ) : products;
-        products = isValidString(this.props.filterObject.filterSubtype)? products.filter((data)=> isValid(data.m_subtype) &&  data.m_subtype.trim().toLowerCase().includes(          this.props.filterObject.filterSubtype.trim().toLowerCase()) ) : products;
-        products = isValidString(this.props.filterObject.filterTag)? products.filter((data)=> isValid(data.tag) &&  data.tag.filter((tagObj) => tagObj.trim().toLowerCase().includes(this.props.filterObject.filterTag.trim().toLowerCase())).length>0 ) : products;
-        products = distinctObjectArrayByKeyFirstOne(products,"base_code" );
-        return products;
-    }
-
-    clearFilters = () => {
+    searchFilter = (tag) => {
         var newFilterObject = {
-            ...this.props.filterObject, 
             filterBaseCode: "",
             filterType: "",
             filterSubtype: "",
-            filterTag: "",
+            filterTag: tag.trim(),
         };
         this.props.changeSearch(newFilterObject);
     }
@@ -169,9 +154,11 @@ export class Information extends Component {
                             </div>
                             <div className="row ">
                                 {this.state.focusedProduct.tag.map((tag)=> {
-                                    return <span key={tag} className="btn btn-success mr-sm-2" >
-                                    {tag}
-                                    </span> 
+                                    return <Link key={tag} to="/search" onClick={() => this.searchFilter(tag)} >
+                                        <span  className="btn btn-success mr-sm-2" >
+                                        {tag}
+                                        </span> 
+                                    </Link>
                                 })
                                 }
                             </div>
