@@ -64,7 +64,7 @@ export class Information extends Component {
     }
     changeFocusedProduct = (item_code) => {
         var newFocusedProduct =  getObjectFromArrayByKey(this.state.relevantProduct,"item_code", item_code);
-
+        if(!isValid(newFocusedProduct)) return;
         //if changed, does color still exist? if not default to first one
         var newFocusedColor =  getObjectFromArrayByKey(newFocusedProduct.color,"color", this.state.focusedColor.color);
         if(!isValid(newFocusedColor)){
@@ -165,7 +165,7 @@ export class Information extends Component {
                             
                         </div>
 
-                        <img className="border border-primary col-sm-6" src={this.state.focusedColor.url} alt="Not found :("/>
+                        <img className=" col-sm-6" src={this.state.focusedColor.url} alt="Not found :("/>
 
                     </div>
 

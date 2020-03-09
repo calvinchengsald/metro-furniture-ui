@@ -15,9 +15,12 @@ export class NavBar extends Component {
     this.state = {
       prevTypes : [],
       _isOpen: false,
-      currentType: ""
+      currentType: "",
+      filterGeneral : "",
     }
   }
+
+  
 
   
   static getDerivedStateFromProps(props, state) {
@@ -53,12 +56,28 @@ export class NavBar extends Component {
           filterType: type,
           filterSubtype: subtype,
           filterTag: "",
+          filterGeneral: "",
       }
       this.props.changeSearch(filterObject);
       this.setState({
         _isOpen: false
       })
   }
+
+  
+  followToGeneralSearch = () => {
+    var filterObject = {
+        filterBaseCode: "",
+        filterType: "",
+        filterSubtype: "",
+        filterTag: "",
+        filterGeneral: this.state.filterGeneral,
+    }
+    this.props.changeSearch(filterObject);
+    this.setState({
+      _isOpen: false
+    })
+}
 
   render() {
 
@@ -98,13 +117,13 @@ export class NavBar extends Component {
       <React.Fragment>
         <div className="d-flex flex-row my-2 p-2 align-items-end">
                 <Link to="/" className="col-sm-3 col-md-2">
-                  <img class="img-fluid" src="https://metro-furniture-resource-stash.s3.amazonaws.com/misc/logo-shrink.png" alt=".not found..." />
+                  <img className="img-fluid" src="https://metro-furniture-resource-stash.s3.amazonaws.com/misc/logo-shrink.png" alt=".not found..." />
                 </Link>
                 <div className="col-sm-9 col-md-10 my-3">
                     <div className="input-group ">
-                        <input type="text" className="shadow form-control  ml-0 align-items-stretch" aria-label="Small" aria-describedby="inputGroup-sizing-sm"></input>
+                        <input type="text" className="shadow form-control  ml-0 align-items-stretch" value={this.state.filterGeneral} onChange={(e)=>this.setStateVariable("filterGeneral", e.target.value )} aria-label="Small" aria-describedby="inputGroup-sizing-sm"></input>
                         <div className="input-group-append">
-                            <span className="btn btn-sm btn-secondary border border-dark" id="base_code">Search</span>
+                            <Link to="/search" className="btn btn-sm btn-secondary border border-dark" id="base_code" onClick={()=>this.followToGeneralSearch()}>Search</Link>
                             <Link to="/search" className="btn btn-sm btn-secondary border border-dark" id="base_code">Advance</Link>
                         </div>
                     </div>

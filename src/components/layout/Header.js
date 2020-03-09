@@ -11,11 +11,13 @@ export const Header = () => {
         <header className=" border-bottom border-dark mb-3" style={headerStyle}>
             <div className="App ml-5 mr-5">
                 <div className="row">
-                    <div className="col-sm-3">
+                    <div className="col-sm-4">
                         <Link className="btn btn-sm btn-secondary" to='/contact'>Contact</Link>
+                        <span className="mx-1 text-secondary font-italic"> 718-366-6888 </span>
+                        <span className="mx-1 text-secondary font-italic"> We've Moved!</span>
                     </div>
-                    <h5 className="col-sm-6 text-center">
-                        <Link style={{ textDecoration: 'none', color: '#000000' }} to='/'>Metro Restaurant Furiture</Link>
+                    <h5 className="col-sm-5 text-center">
+                        <Link className="font-weight-bold" style={{ textDecoration: 'none', color: '#000000' }} to='/'>Metro Restaurant Furiture</Link>
                     </h5>
                     <div className="col-sm-3 d-flex justify-content-end">
                         {isAuthenticated && 

@@ -31,10 +31,22 @@ export class Search extends Component {
         this.props.changeSearch(newFilterObject);
     }
     
+    applyGeneralFilter = (data, generalFilter) => {
+        if (isValid(data.item_code) &&  data.item_code.trim().toLowerCase().includes(generalFilter.trim().toLowerCase()) ) return true;
+        if (isValid(data.base_code) &&  data.base_code.trim().toLowerCase().includes(generalFilter.trim().toLowerCase()) ) return true;
+        if (isValid(data.m_size) &&  data.m_size.trim().toLowerCase().includes(generalFilter.trim().toLowerCase()) ) return true;
+        if (isValid(data.m_type) &&  data.m_type.trim().toLowerCase().includes(generalFilter.trim().toLowerCase()) ) return true;
+        if (isValid(data.m_subtype) &&  data.m_subtype.trim().toLowerCase().includes(generalFilter.trim().toLowerCase()) ) return true;
+        if (isValid(data.color) &&  data.color.filter((color) => isValid(color.color) && color.color.trim().toLowerCase().includes(generalFilter.trim().toLowerCase())).length>0  ) return true;
+        if (isValid(data.notes) &&  data.notes.trim().toLowerCase().includes(generalFilter.trim().toLowerCase()) ) return true;
+        if (isValid(data.tag) &&  data.tag.filter((tagObj) => tagObj.trim().toLowerCase().includes(generalFilter.trim().toLowerCase())).length>0  ) return true;
+        return false;
+    }
 
 
     filterProducts = () => {
         var products = this.props.products;
+        products = isValidString(this.props.filterObject.filterGeneral)? products.filter((data)=> this.applyGeneralFilter(data,this.props.filterObject.filterGeneral) ) : products;
         products = isValidString(this.props.filterObject.filterBaseCode)? products.filter((data)=> isValid(data.base_code) &&  data.base_code.trim().toLowerCase().includes(         this.props.filterObject.filterBaseCode.trim().toLowerCase()) ) : products;
         products = isValidString(this.props.filterObject.filterType)? products.filter((data)=> isValid(data.m_type) &&  data.m_type.trim().toLowerCase().includes(                   this.props.filterObject.filterType.trim().toLowerCase()) ) : products;
         products = isValidString(this.props.filterObject.filterSubtype)? products.filter((data)=> isValid(data.m_subtype) &&  data.m_subtype.trim().toLowerCase().includes(          this.props.filterObject.filterSubtype.trim().toLowerCase()) ) : products;
@@ -50,6 +62,7 @@ export class Search extends Component {
             filterType: "",
             filterSubtype: "",
             filterTag: "",
+            filterGeneral: "",
         };
         this.props.changeSearch(newFilterObject);
     }
@@ -130,7 +143,17 @@ export class Search extends Component {
 
                 <div className="container-fluid mt-3 border border-grey bg-light">
 
-                    <div className="row border border-dark ">
+                    <div className="row  border-dark border-top border-right border-left">
+                        <div className="col mt-3">
+                            <div className="input-group ">
+                                <div className="input-group-prepend">
+                                    <span className="input-group-text" id="base_code">General Search</span>
+                                </div>
+                                <input type="text" className="form-control  ml-0 align-items-stretch" value={this.props.filterObject.filterGeneral} onChange={(e)=>this.setStateVariable("filterGeneral", e.target.value )} aria-label="Small" aria-describedby="inputGroup-sizing-sm"></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row  border-dark border-bottom  border-right border-left">
 
                         <div className="col my-3">
                             <div className="input-group ">

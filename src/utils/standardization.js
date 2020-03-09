@@ -246,7 +246,6 @@ export const callApiWithToken = async (that, callback, errorMessage) => {
               }
         }
         callback(config);
-        console.log(config)
     } catch (error) {
         errorMessage("Authorization Error", "You must be logged in to make that action");
       console.error(error);

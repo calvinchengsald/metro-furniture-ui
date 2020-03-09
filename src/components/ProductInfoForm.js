@@ -142,7 +142,6 @@ export class ProductInfoForm extends Component {
         var file = e.target.files[0];
         callApiWithToken(this, (config)=>{
             this.props.deletePostS3(file, this.state.m_type + "/" + this.state.m_subtype +"/", "", config,(success, url)=> {
-                console.log(url);
                 if (success){
                     this.editColorModel(uuid, "url", url);
 

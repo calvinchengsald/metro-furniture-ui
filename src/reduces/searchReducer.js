@@ -6,6 +6,7 @@ const initialState = {
         filterType: "",
         filterSubtype: "",
         filterTag: "",
+        filterGeneral: "",
     }
 }
 
