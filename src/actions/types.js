@@ -1,5 +1,8 @@
 
-export const basePath = 'http://localhost:8080';
+// export const basePath = 'http://localhost:8080';
+export const basePath = 'http://ec2-54-197-209-9.compute-1.amazonaws.com:8080/';
+
+
 
 
 export const actionTypes = {
