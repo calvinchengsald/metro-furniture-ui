@@ -24,7 +24,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "copy src\\configurations\\config.js src\\configurations\\configBk.js && copy src\\configurations\\configProduction.js src\\configurations\\config.js && react-scripts build && move src\\configurations\\configBk.js src\\configurations\\config.js ",
+    "deploy" : "aws s3 sync ./build s3://metro2-furniture-ny.com",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

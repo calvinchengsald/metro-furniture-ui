@@ -1,7 +1,8 @@
-import {actionTypes, basePath} from '../actions/types'
+import {actionTypes} from '../actions/types'
 import axios from 'axios';
 import {modelAttributeMapping} from '../models/models';
 import {objectStandardizer } from '../utils/standardization';
+import {basePath} from '../configurations/config';
 
 
 

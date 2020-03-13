@@ -40,7 +40,7 @@ function App() {
           <NavBar></NavBar> 
           <Route exact path="/" render={props => (
             <React.Fragment>
-              <p>Home page source stuff</p>
+              <p>Home page source stuff updated</p>
               <ProductPicker></ProductPicker>
             </React.Fragment>
           )} />

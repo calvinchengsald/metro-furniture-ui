@@ -1,7 +1,8 @@
-import {actionTypes, basePath} from '../actions/types';
+import {actionTypes} from '../actions/types';
 import axios from 'axios';
 import {objectStandardizer } from '../utils/standardization';
 import {modelAttributeMapping} from '../models/models';
+import {basePath} from '../configurations/config';
 
 export function fetchTypes() {
 
@@ -37,7 +38,7 @@ export function postTypes(type,config,callbackSuccessfulUpdate) {
          
         console.log("just this cors");
          type = objectStandardizer(type, modelAttributeMapping.TYPE_MODEL );
-         axios.post( basePath +'/typehiearchy', type,config)
+         axios.post( basePath +'/typehiearchy/insert', type,config)
          .then(res => {
             callbackSuccessfulUpdate(true);
             var newType  = objectStandardizer(res.data.content, modelAttributeMapping.TYPE_MODEL );
