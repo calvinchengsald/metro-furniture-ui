@@ -223,7 +223,7 @@ export function cloneObjectArray(array) {
 
 export const GetAuthenticationHeader = () => {
     console.log("in here");
-    const {  user, getTokenSilently,getIdTokenClaims } = useAuth0();
+    const {   getTokenSilently,getIdTokenClaims } = useAuth0();
     console.log(getIdTokenClaims().__raw);
     console.log(getTokenSilently());
       let config = {

@@ -104,26 +104,26 @@ export class Information extends Component {
                 : 
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-sm-6">
+                        <div className="col-sm-12 col-md-6">
                             <hr></hr>
                             <div className="row">
                                 <h1 className="col-sm-12 text-center">{this.state.focusedProduct.item_code}</h1> 
                             </div>
                             <div className="row">
-                                <h5 className="col-md-6 col-lg-4 text-left border">Base Code:</h5> 
-                                <h5 className="col-md-6 col-lg-8 text-left border">{this.state.focusedProduct.base_code}</h5> 
+                                <h5 className="col-sm-6 col-lg-4 text-left border">Base Code:</h5> 
+                                <h5 className="col-sm-6 col-lg-8 text-left border">{this.state.focusedProduct.base_code}</h5> 
                             </div>
                             <div className="row">
-                                <h5 className="col-md-6 col-lg-4 text-left border">Type:</h5> 
-                                <h5 className="col-md-6 col-lg-8 text-left border">{this.state.focusedProduct.m_type}</h5> 
+                                <h5 className="col-sm-6 col-lg-4 text-left border">Type:</h5> 
+                                <h5 className="col-sm-6 col-lg-8 text-left border">{this.state.focusedProduct.m_type}</h5> 
                             </div>
                             <div className="row">
-                                <h5 className="col-md-6 col-lg-4 text-left border">Subtype:</h5> 
-                                <h5 className="col-md-6 col-lg-8 text-left border">{this.state.focusedProduct.m_subtype}</h5> 
+                                <h5 className="col-sm-6 col-lg-4 text-left border">Subtype:</h5> 
+                                <h5 className="col-sm-6 col-lg-8 text-left border">{this.state.focusedProduct.m_subtype}</h5> 
                             </div>
                             <div className="row">
-                                <h5 className="col-md-6 col-lg-4 text-left border">Notes:</h5> 
-                                <h5 className="col-md-6 col-lg-8 text-left border">{this.state.focusedProduct.notes}</h5> 
+                                <h5 className="col-sm-6 col-lg-4 text-left border">Notes:</h5> 
+                                <h5 className="col-sm-6 col-lg-8 text-left border">{this.state.focusedProduct.notes}</h5> 
                             </div>
                             <div className="row">
                                 <h5>Size:</h5> 
@@ -163,9 +163,12 @@ export class Information extends Component {
                                 }
                             </div>
                             
+                            <hr></hr>
+                            
                         </div>
-
-                        <img className=" col-sm-6" src={this.state.focusedColor.url} alt="Not found :("/>
+                        <div className="col-sm-12 col-md-6 mt-2 pt-2">
+                            <img className="img-responsive" style={{width: "100%"}} src={this.state.focusedColor.url} alt="Not found :("/>
+                        </div>               
 
                     </div>
 

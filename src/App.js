@@ -11,14 +11,14 @@ import  Information  from './components/view/Information';
 import { useAuth0 } from "./react-auth0-spa";
 import  NavBar  from './components/layout/NavBar';
 import ExternalApi from './components/view/ExternalApi';
-import ProductPicker from './components/view/ProductPicker';
 import AppInit from './AppInit'
 import { Contact } from './components/layout/Contact';
+import  Home  from './components/pages/Home'
 
 function App() {
   
   
-  const { loading, getTokenSilently } = useAuth0();
+  const {  getTokenSilently } = useAuth0();
 
       
   const PrivateRoute = ({ component: Component, ...rest }) => {
@@ -33,16 +33,15 @@ function App() {
 
   return (
       
+      
       <Router>
         <Header>       </Header>
         <div className="App ml-5 mr-5">
           <AppInit></AppInit>
           <NavBar></NavBar> 
           <Route exact path="/" render={props => (
-            <React.Fragment>
-              <p>Home page source stuff updated</p>
-              <ProductPicker></ProductPicker>
-            </React.Fragment>
+            <Home></Home>
+
           )} />
           <Route path="/search" component={Search} />
           <Route path="/about" component={About} />
@@ -53,8 +52,9 @@ function App() {
           <PrivateRoute path="/external_api" component={ExternalApi} />
           <Route path="/contact" component={Contact} />
           <MessageBox></MessageBox>
-          <Footer></Footer>
         </div>
+        
+        <Footer></Footer>
       </Router>
   );
 }

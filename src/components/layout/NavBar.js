@@ -115,9 +115,15 @@ export class NavBar extends Component {
 
     return (
       <React.Fragment>
+        
+        <div className="d-flex flex-row ">
+          <h1 className="col text-center font-italic font-weight-bold py-0 my-0">
+              <Link className="font-weight-bold" style={{ textDecoration: 'none', color: '#000000' }} to='/'>Metro Restaurant Furiture</Link>
+          </h1>
+        </div>
         <div className="d-flex flex-row my-2 p-2 align-items-end">
                 <Link to="/" className="col-sm-3 col-md-2">
-                  <img className="img-fluid" src="https://metro-furniture-resource-stash.s3.amazonaws.com/misc/logo-shrink.png" alt=".not found..." />
+                  <img className="img-fluid" src="https://metro2-furniture-resource-stash.s3.amazonaws.com/misc/logo-shrink.png" alt=".not found..." />
                 </Link>
                 <div className="col-sm-9 col-md-10 my-3">
                     <div className="input-group ">
