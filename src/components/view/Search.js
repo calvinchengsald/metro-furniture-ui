@@ -155,7 +155,7 @@ export class Search extends Component {
                     </div>
                     <div className="row  border-dark border-bottom  border-right border-left">
 
-                        <div className="col-sm-6 col-md-6 col-lg-6 my-3">
+                        <div className="col-sm-6 col-md-6 col-lg-6 col-xl  my-3">
                             <div className="input-group ">
                                 <div className="input-group-prepend">
                                     <span className="input-group-text" id="base_code">Base Code</span>
@@ -165,7 +165,7 @@ export class Search extends Component {
                         </div>
                         
                         
-                        <div className="col-sm-6 col-md-6 col-lg-6 my-3">
+                        <div className="col-sm-6 col-md-6 col-lg-6 col-xl  my-3">
                             <div className="input-group ">
                                 <div className="input-group-prepend">
                                     <span className="input-group-text" id="tag">Tag</span>
@@ -176,7 +176,7 @@ export class Search extends Component {
                         
                         
 
-                        <div className="col-sm-4 col-md-4 col-lg-4 my-3 mx-2">
+                        <div className="col-sm-4 col-md-4 col-lg-4  col-xl my-3 mx-2">
                             <Dropdown className="row">
                                 <span className="input-group-text col-sm-3" >Type</span>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic" className="col-sm-9">
@@ -191,7 +191,7 @@ export class Search extends Component {
                             </Dropdown>
                         </div>
                         
-                        <div className="col-sm-4 col-md-4 col-lg-4 my-3 mx-2">
+                        <div className="col-sm-4 col-md-4 col-lg-4 col-xl my-3 mx-2">
                             <Dropdown className="row">
                                 <span className="input-group-text col-sm-4" >Subtype</span>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic" className="col-sm-8">

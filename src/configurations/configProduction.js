@@ -1,2 +1,2 @@
 
-export const basePath = 'http://ec2-54-224-94-100.compute-1.amazonaws.com:8080';
+export const basePath = 'https://metrofurnitureny-1188951267.us-east-1.elb.amazonaws.com';
