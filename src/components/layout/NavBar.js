@@ -118,7 +118,7 @@ export class NavBar extends Component {
         
         <div className="d-flex flex-row ">
           <h1 className="col text-center font-italic font-weight-bold py-0 my-0">
-              <Link className="font-weight-bold" style={{ textDecoration: 'none', color: '#000000' }} to='/'>Metro Restaurant Furiture</Link>
+              <Link className="font-weight-bold" style={{ textDecoration: 'none', color: '#000000' }} to='/'>Metro Restaurant Furniture</Link>
           </h1>
         </div>
         <div className="d-flex flex-row my-2 p-2 align-items-end">
